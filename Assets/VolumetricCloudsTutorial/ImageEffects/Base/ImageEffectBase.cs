@@ -23,7 +23,7 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         /// <param name="depthBits">Number of depth bits of the RenderTexture</param>
         /// <param name="antiAliasing">Level of Antialiasing of the RenderTexture</param>
         /// <returns>If a new RenderTexture was created.</returns>
-        protected static bool EnsureRenderTarget(ref RenderTexture rt, int width, int height, RenderTextureFormat format, FilterMode filterMode, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool randomWrite = false, bool useMipmap = false, int depthBits = 0, int antiAliasing = 1)
+        protected static bool EnsureRenderTexture(ref RenderTexture rt, int width, int height, RenderTextureFormat format, FilterMode filterMode, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool randomWrite = false, bool useMipmap = false, int depthBits = 0, int antiAliasing = 1)
         {
             if (rt != null && (rt.width != width || rt.height != height || rt.format != format || rt.filterMode != filterMode || rt.enableRandomWrite != randomWrite || rt.wrapMode != wrapMode || rt.antiAliasing != antiAliasing || rt.useMipMap != useMipmap))
             {
@@ -50,7 +50,7 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         /// Releases a RenderTexture by reference.
         /// </summary>
         /// <param name="rt">The RenderTexture</param>
-        protected static void ReleaseRenderTarget(ref RenderTexture rt)
+        protected static void ReleaseRenderTexture(ref RenderTexture rt)
         {
             if (rt != null)
             {
