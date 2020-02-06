@@ -1,6 +1,6 @@
 # Image Effects
 
-## Base Image Effect
+## Base Image Effect (`ImageEffectBase.cs`)
 
 ### Overview
 
@@ -63,7 +63,7 @@ the quadrilateral to be the view vectors of the four corners of the frustum.
 These will be interpolated in the shader, so we can easily reconstruct the view
 ray from the camera at any point sampled.
 
-### Overview of Functions
+### Class Overview
 
 #### `EnsureRenderTexture(ref RenderTexture rt, int width, int height, RenderTextureFormat format, FilterMode filterMode, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool randomWrite = false, bool useMipmap = false, int depthBits = 0, int antiAliasing = 1)`
 
@@ -90,7 +90,7 @@ we will `RenderTextureFormat.ARGBFloat` so we can store floating-point precision
 results of our calculation at each step.
 * FilterMode: How to sample this texture, when sampling in-between neighbouring
 pixels -- for instance, when a downscaled RenderTexture is sampled at the full
-screen resolution. `FilterMode.Bilinear` is usually perferred.
+screen resolution. `FilterMode.Bilinear` is usually preferred.
 * TextureWrapMode: How to sample when outside the edges of the texture.
 `TextureWrapMode.Clamp` is usually preferred, since we are sampling in
 screen space and do not wish to wrap to the other side. This is relevant if we
@@ -112,6 +112,45 @@ any downscaled intermediate results will be sufficient.
 
 #### `Vector4 GetProjectionExtents(Camera camera, float texelOffsetX, float texelOffsetY)`
 
+This function get the frustum extents and jitter at distance 1 from the camera.
+The jitter is given in units of texels, specified by the two input `texelOffset`
+parameters.
 
+By passing these values into the shader, we can determine the location of a
+sampled point at distance 1 in view (camera) space, which can be used to
+reconstruct the view direction vector of the sample.
 
-TODO
+For some calculations, we may wish to add some jitter in x and y to the sampled
+position, but we will concern ourselves with the case
+`texelOffsetX = texelOffsetY = 0`.
+
+#### `DrawFullScreenQuad(Camera camera, RenderTexture destination)`
+
+As discussed above, uses `Gl.Begin` and related functions to drawn a full-screen
+quadrilateral from two triangles, storing the frustum corner direction vectors
+in the texture coordinate normals.
+
+#### `[SerializeField] Shader _shader`
+Shader for the image effect, to be serialized and set in the Inspector.
+
+#### `Material _material`
+The Material instantiated from `_shader`.
+
+#### `Camera _camera`
+The Camera component on this GameObject. We ensure one exists by adding the
+`[RequireComponent(typeof(Camera))]` attribute to the class.
+
+Obtained in Unit's Awake() message
+function and ensured to have depth in OnEnable(), through
+`_camera.depthTextureMode |= DepthTextureMode.Depth`.
+
+#### `OnRenderImage(RenderTexture source, RenderTexture destination)`
+
+If no Shader is set, we only call `Graphics.Blit(source, destination)` to
+copy the source RenderTexture to the destination.
+
+Otherwise, we ensure a Material is created with the chosen Shader,
+and set the Material's `_MainTex` property as the source RenderTexture.
+We then call our two abstract functions: `UpdateMaterial` and `PerformEffect`.
+Respectively, these update the rest of the Material's properties, and perform
+the full-screen effect (using the techniques described above).
