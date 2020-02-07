@@ -28,16 +28,16 @@ scattered in different directions many times.
 
 Since we need to consider what is happening at all points _inside_ the cloud,
 we can break our task into three main pieces.
-1. We need to simulate or approximate a fully three-dimensional representation
+1. _Cloud Density_. We need to simulate or approximate a fully three-dimensional representation
 of the density of the cloud at all points in space, since this is what will
 control the absorption and scattering mentioned above.
-2. At each pixel we view on the screen, we need to consider all of the
+2. _Raymarching_. At each pixel we view on the screen, we need to consider all of the
 light that last got scattered by the cloud and ended up travelling to the
 camera on the view vector associated with the pixel. This requires us to consider
 all points along the view vector inside the cloud and determine how much of the
 light scattered this way would make its way through the rest of the cloud
 _without_ being scattered or absorbed.
-3. We need to determine the probability that light will be absorbed or
+3. _Lighting and Shadows_. We need to determine the probability that light will be absorbed or
 scattered in different directions, depending on the density of the cloud.
 
 For density determination in (1), we will take an approximate approach that will
@@ -57,11 +57,17 @@ camera's view ray from that pixel, and perform raymarching through the portion
 of the atmosphere where clouds occur.
 
 To determine the lighting contribution at each raymarch step in (3), we will
-first begin by considering light that has undergone scattering once from
+first begin by considering light that has undergone scattering _one_ time from
 its source (the sun). As noted previously, clouds are a somewhat special case
 of volumetric rendering where multiple scattering events need to be simulated
-to capture the proper light intensity.
-
+to capture the proper light intensity. Since this is computationally too
+expensive to be performed in real-time, we will instead apply approximations and
+alterations of the single-scattering lighting to roughly match the desired
+visual look. At each point in the raymarch, we determine the fraction of sun
+light intensity that has not been scattered or absorbed on its way to that point,
+then the fraction of light that will be scattered in the direction of the camera,
+then the fraction that will not be scattered or absorbed on its way out of the
+cloud before it reaches the camera.
 
 TODO
 
