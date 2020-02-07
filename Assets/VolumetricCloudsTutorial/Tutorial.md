@@ -87,9 +87,27 @@ For similar compatibility reasons, we will keep our work within the Assets
 folder. With the appropriate Assembly Definition Files and manifest, it could be
 converted to the Unity Package Manager format.
 
-### Noise Textures
+### Shaders
 
 TODO
+
+### Noise and Lookup Textures
+
+As discussed in the [Cloud Density](CloudDensity/CloudDensity.md) page, we
+will have several pre-generated textures that parametrize the atmospheric cloud
+coverage and cloud density. By using pre-generated textures where possible, we
+gain in speed of texture lookup over performing similar calculations each frame
+within the shader, and we help expose authorable textures to the user.
+
+Such as set-up will be limited in its configurability, since we will be limited
+to changing the textures or the relationships between them in the final
+calculation. In considering future extensions to this approach, we could
+update these textures occasionally in real time, either through CPU calculation
+or GPU calculation (for instance, using compute shaders).
+
+These textures will be a mixture of 2D and 3D. See the
+[Noise Textures](CloudDensity/NoiseTextures/NoiseTextures.md) page for details
+on how we will handle creation of Unity's `Texture3D` for the noise textures.
 
 ## Components
 
