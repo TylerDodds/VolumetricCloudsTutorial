@@ -36,12 +36,15 @@ The authors have released a C++ project
 [TileableVolumeNoise](https://github.com/sebh/TileableVolumeNoise) that can
 help generate the types of tileable, three-dimensional noise textures that can
 be used to represent cloud density. We will use my
-[fork](https://github.com/TylerDodds/TileableVolumeNoise), which ensures that
+[fork](https://github.com/TylerDodds/TileableVolumeNoise/tree/feature/premultiplied-alpha),
+which ensures that
 the default outputs do not have incorrect pre-multiplied alpha processing,
 so that all four channels of the texture (RGBA) will be imported into Unity
 as expected. These textures are generated as long strips of 2D images, so
 we will need additional work to bring them into Unity as `Texture3D`.
-See the [NoiseTextures](NoiseTextures/NoiseTextures.md) page for details.
+See the [NoiseTextures](NoiseTextures/NoiseTextures.md) page for details on how
+to process and unpack all four channels of this texture to obtain the base
+density.
 
 TODO
 
