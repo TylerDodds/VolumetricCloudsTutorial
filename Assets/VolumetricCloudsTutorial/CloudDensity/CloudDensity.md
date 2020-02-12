@@ -24,6 +24,48 @@ lighting at the surface.
 
 ## Local Density
 
+### Common Operations
+
+#### Remap
+
+The Remap function is a simple linear operation used to map a value or set of
+values to a new range:
+````
+Remap(Value, OldMin, OldMax, NewMin, NewMax) = NewMin + (Value - OldMin) * (NewMax - NewMin) / (OldMax - OldMin)
+````
+
+In simple usage, while `Value` is a variable, while the old and new min and max
+values are taken constant, so Remap just scales and offsets `Value`.
+
+In our usage, one of the range values is also a variable. In this way, we can
+use a different noise value to modulate an original noise used in `Value`.
+
+_Example_
+
+Frequently, the Remap function is used to 'trim away' the edges of a base function
+through modulation with a higher-frequency detail function:
+`Remap(Base, Detail, 1, 0, 1)`. Parts where the base function is close to the
+maximum of 1 are unaffected by this remapping, since original values of 1 are
+remapped to 1. Parts where the base function are smaller, however, will be
+shrunk based on the value of the detail function. Let's visualize this in a
+simple 2D example.
+
+![Small Remapping](Remap_Small.png "Small Remapping")
+
+With a small detail function (in grey), the base function (in red) is relatively
+unchanged when its value is large, and only when its value is small do we see
+the remapped result (in blue) responding to the detail function instead.
+
+![Large Remapping](Remap_Large.png "Large Remapping")
+
+With a large detail function, the effect is more pronounced. The effect of the
+detail function in the remapping is seen when the base function value is small --
+namely, at the edges of the peaks.
+
+#### Other
+
+TODO - others common operations
+
 ### Base Density
 
 We can build on the large body of work that has been done in modelling cloud

@@ -115,19 +115,50 @@ format texture.
 
 #### Generating Fractal and Perlin-Worley Noise
 
-TODO
+Perlin and Worley noise functions each depend not only on the position of the
+pixel, but also the _frequency_ of the noise. In most cases you can consider
+the frequency directly multiplying the pixel position, equivalent to shrinking
+a larger-size noise into the same number of pixels, giving smaller-sized details.
+
+Fractal noise adds smaller and smaller amounts of higher-frequency noises, as
+in the following expression:
+````
+Fractal = A * Noise(p, 1) + A^2 * Noise(p, f) + A^3 * Noise(p, f^2) + ...
+````
+
+Common factors are to double the frequency (`f = 2`) and halve the amplitude
+(`A = 0.5`) each octave. Eventually the fractal will be cut off one the
+frequency becomes too large for the noise to properly represented even between
+neighbouring pixels.
+
+The Perlin-Worley noise is obtained by using the _Remap_ function discussed
+in further detail in [CloudDensity](CloudDensity/CloudDensity.md).
+Refer to the _TileableVolumeNoise_ source for full implementation details.
+
+````
+PerlinWorley = Remap(PerlinFractal, 0, 1, WorleyFractal, 1)
+````
+
+This means that the base Perlin noise will be remapped to a range where its
+minimum is the Worley noise. It will be unchanged when the Worley noise is low,
+and will be brightened where the Worley noise is large.
 
 #### Unpacking and Remapping
 
 Now, we take our one Perlin-Worley noise channel and three Worley noise channels,
 and wish to combine them to make the final noise.
 
-We'll begin by combining our three individual Worley noise textures into the
-fractal noise version,
-`WorleyFractal = 0.625*Worley1 + 0.25*Worley2 + 0.125*Worley3`,
+We'll begin by combining our three individual Worley noise textures into a
+high-frequency fractal noise version,
+`WorleyHighFrequencies = 0.625*Worley1 + 0.25*Worley2 + 0.125*Worley3`,
 where we weight lower-frequency noise with a higher multiplier.
 
-TODO Discuss unpacking -- where?
+Then, the base density for the noise is given by remapping the Perlin-Worley
+channel with the sum of the Worley channels, so that the edges of the
+Perlin-Worley noise will gain some of the billowiness of the Worley noises.
+````
+BaseNoise = Remap(PerlinWorley, WorleyHighFrequencies, 1, 0, 1)
+````
 
 TODO Reference unpacking in shader.
 
