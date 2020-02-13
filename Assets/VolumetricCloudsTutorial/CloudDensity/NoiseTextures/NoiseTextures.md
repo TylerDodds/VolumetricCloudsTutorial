@@ -20,7 +20,7 @@ used to refer to any type of
 To get a feel for working with Perlin noise, check out the
 [Book Of Shaders chapter](https://thebookofshaders.com/11/) on it.
 
-![Simplex Noise](simplex.png "Simple Noise")
+![Simplex Noise](Docs/simplex.png "Simple Noise")
 
 ### Worley Noise
 
@@ -31,7 +31,7 @@ blobby noise, where the noise value is based on the distance to a set of
 To get a feel for working with Worley noise, check out the
 [Book Of Shaders chapter](https://thebookofshaders.com/12/) on it.
 
-![Worley Noise](worley.jpg "Worley Noise")
+![Worley Noise](Docs/worley.jpg "Worley Noise")
 
 ### Curl Noise
 
@@ -70,7 +70,7 @@ technique of fractal noise (or _Fractal Brownian Motion_ -- again, see the
 Simply put, this means adding together many types of the same noise, each with
 higher frequency, or equivalently, a smaller distance scale.
 
-![Fractal Worley Noise](worley-fract.png "Fractal Worley Noise")
+![Fractal Worley Noise](Docs/worley-fract.png "Fractal Worley Noise")
 
 The resulting noise already looks less synthetic than the original.
 We will use this technique for both the Perlin-Worley and Worley noises.
@@ -79,7 +79,7 @@ The base Perlin-Worley noise will be used at the lowest frequency to give the
 overall shape. It will retain the connectedness of the Perlin noise and the
 billowiness of the Worley noise.
 
-![Perlin-Worley Noise](perlin-worley.png "Perlin-Worley Noise")
+![Perlin-Worley Noise](Docs/perlin-worley.png "Perlin-Worley Noise")
 
 However, we will make use of even higher-frequency Worley noise to further
 shape our clouds. As a result,
@@ -132,7 +132,7 @@ frequency becomes too large for the noise to properly represented even between
 neighbouring pixels.
 
 The Perlin-Worley noise is obtained by using the _Remap_ function discussed
-in further detail in [CloudDensity](CloudDensity/CloudDensity.md).
+in further detail in [CloudDensity](../CloudDensity.md).
 Refer to the _TileableVolumeNoise_ source for full implementation details.
 
 ````
@@ -168,4 +168,42 @@ TODO
 
 ### Generating and Importing
 
-TODO
+#### Generating
+
+Open and build the `TileableVolumeNoise.sln` solution file from the
+[fork](https://github.com/TylerDodds/TileableVolumeNoise/tree/feature/premultiplied-alpha)
+mentioned in [CloudDensity](../CloudDensity.md).
+It's easiest to use Visual Studio with C++ features installed
+(you can use the Visual Studio Installer to add these if your version of Visual
+Studio from the Unity install doesn't include them).
+
+It will write `noiseShape.tga` (base density) and `noiseErosion.tga` (detail
+density) textures into the folder where `TileableVolumeNoise.exe` is generated.
+The base density image is 16384x128, packing a 128x128x128 3D texture
+horizontally. The detail density image is 1024x32, packing a 32x32x32 3D texture
+horizontally.
+
+Note that it will also generated packed versions of these noises, where the
+unpacking step has already been performed. As mentioned above, we'll perform
+the unpacking ourselves.
+
+#### Importing (`TextureSplit.cs`)
+
+We'll need to slice up these textures, and then represent them as a Texture3D
+asset within Unity. Without a 3D texture format we can simply import into Unity,
+that means we'll need to create the Texture3D ourselves using editor scripting.
+As a result, we'll do the slicing within Unity as well.
+
+First, we import `noiseShape.tga` and `noiseErosion.tga` into our Unity project.
+We'll set the Format to _RGBA 32 Bit_, turn off _alpha is transparency_, turn
+off _generate mipmaps_, turn off sRGB, set read-write enabled,
+and set the max size to 4096. We'll note that
+`noiseShape.tga` has a width of 16384, larger than what we can select in Unity.
+Fortunately, the function `SetMaxSize` can set larger maximum texture sizes, up
+to the system maximum. In my case, this was exactly 16384, so I was able to
+import the texture at full size by calling this function through
+`Tools/Textures/Set Max Size To 16384`.
+
+Next, we'll split each texture using the `SplitSelectedTexture` function through
+`Tools/Textures/Split Texture2D To Texture3D Cube`. This leaves us with the
+`NoiseShape.asset` and `NoiseErosion.asset` Texture3D assets.
