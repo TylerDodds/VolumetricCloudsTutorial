@@ -2,7 +2,13 @@
 
 ## Overview
 
-TODO
+We will use pre-generated noise textures composed in an easily-configurable way
+to a create cloud density field that evolves interestingly over both time and
+space.
+As discussed in [CloudDensity](../CloudDensity.md), these consist of 3D noise
+textures to generate _local_ density by combining a base density with a detail
+density, as well as 2D textures to modulate that based on the cloud's horizontal
+position.
 
 ## Basic Noise types
 
@@ -50,9 +56,23 @@ a convincing flow effect.
 Check out this [blog post](http://petewerner.blogspot.com/2015/02/intro-to-curl-noise.html)
 and the references therein for more details.
 
-## Cloud Noise Textures
+## Cloud Density Noise Textures (3D)
 
-TODO References
+As mentioned in [CloudDensity](../CloudDensity.md),
+we will follow this
+[fork](https://github.com/TylerDodds/TileableVolumeNoise/tree/feature/premultiplied-alpha),
+of the [TileableVolumeNoise](https://github.com/sebh/TileableVolumeNoise)
+project. Part of the
+[Physically Based Shading in Theory and Practice](https://blog.selfshadow.com/publications/s2016-shading-course/).
+SIGGRAPH 2016 course, it is designed to specifically generate the base and
+detail noise textures for this type of volumetric clouds.
+
+Additionally, the many
+([1](https://www.guerrilla-games.com/read/the-real-time-volumetric-cloudscapes-of-horizon-zero-dawn),
+[2](https://www.guerrilla-games.com/read/nubis-authoring-real-time-volumetric-cloudscapes-with-the-decima-engine),
+[3](https://www.guerrilla-games.com/read/nubis-realtime-volumetric-cloudscapes-in-a-nutshell))
+presentations on Guerrilla Games' Nubis cloud rendering engine contain a
+portion regarding the cloud density noise textures.
 
 ### Base Density Noise Texture
 
@@ -160,11 +180,18 @@ Perlin-Worley noise will gain some of the billowiness of the Worley noises.
 BaseNoise = Remap(PerlinWorley, WorleyHighFrequencies, 1, 0, 1)
 ````
 
-TODO Reference unpacking in shader.
+TODO Reference unpacking in shader .cginc file.
 
 ### Detail Density Noise Textures
 
-TODO
+The detail noise texture is simply Worley fractal noise. However, since the
+detail will operate at smaller scales and will primarily be visible at the edges
+of the clouds, it will be a higher-frequency but smaller texture than the
+Worley component of the base noise.
+
+We will use the same packing scheme as the Worley components of the base density,
+but use the RGB channels only. The alpha channel will be left unused in this
+texture.
 
 ### Generating and Importing
 
@@ -207,3 +234,7 @@ import the texture at full size by calling this function through
 Next, we'll split each texture using the `SplitSelectedTexture` function through
 `Tools/Textures/Split Texture2D To Texture3D Cube`. This leaves us with the
 `NoiseShape.asset` and `NoiseErosion.asset` Texture3D assets.
+
+## Cloud Distribution Noise Textures (2D)
+
+TODO
