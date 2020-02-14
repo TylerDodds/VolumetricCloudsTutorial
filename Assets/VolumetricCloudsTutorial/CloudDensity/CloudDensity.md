@@ -22,11 +22,9 @@ We will wish to parametrize this based on type.
 lighting at the surface.
 * Determine the time evolution of the rough and detailed cloud densities.
 
-## Local Density
+## Common Operations
 
-### Common Operations
-
-#### Remap
+### Remap
 
 The Remap function is a simple linear operation used to map a value or set of
 values to a new range:
@@ -62,9 +60,12 @@ With a large detail function, the effect is more pronounced. The effect of the
 detail function in the remapping is seen when the base function value is small --
 namely, at the edges of the peaks.
 
-#### Other
+### Other
 
 TODO - others common operations
+
+
+## Local Density
 
 ### Base Density
 
