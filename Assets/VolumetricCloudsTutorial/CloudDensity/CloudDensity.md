@@ -48,17 +48,21 @@ remapped to 1. Parts where the base function are smaller, however, will be
 shrunk based on the value of the detail function. Let's visualize this in a
 simple 2D example.
 
-![Small Remapping](Remap_Small.png "Small Remapping")
+![Small Remapping](Docs/Remap_Small.png "Small Remapping")
 
 With a small detail function (in grey), the base function (in red) is relatively
 unchanged when its value is large, and only when its value is small do we see
 the remapped result (in blue) responding to the detail function instead.
 
-![Large Remapping](Remap_Large.png "Large Remapping")
+![Large Remapping](Docs/Remap_Large.png "Large Remapping")
 
 With a large detail function, the effect is more pronounced. The effect of the
 detail function in the remapping is seen when the base function value is small --
 namely, at the edges of the peaks.
+
+The remap function, along with a clamped version (restricting the final value
+between NewMin and NewMax) are implemented for use in our shaders in
+`MathUtil.cginc`.
 
 ### Other
 
