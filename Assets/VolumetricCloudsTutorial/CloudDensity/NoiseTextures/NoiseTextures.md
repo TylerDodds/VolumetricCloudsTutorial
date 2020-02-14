@@ -180,7 +180,11 @@ Perlin-Worley noise will gain some of the billowiness of the Worley noises.
 BaseNoise = Remap(PerlinWorley, WorleyHighFrequencies, 1, 0, 1)
 ````
 
-TODO Reference unpacking in shader .cginc file.
+In `NoiseTextureUtil.cginc`, the Worley fractal noise is unpacked by the
+`UnpackOctaves` function, and the base noise is unpacked by the
+`UnpackPerlinWorleyBaseNoise` function. Note that we add an additional
+configurable density offset to the Perlin-Worley noise before remapping
+with the high-frequency noise.
 
 ### Detail Density Noise Textures
 
