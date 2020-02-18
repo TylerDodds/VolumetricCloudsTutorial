@@ -3,17 +3,17 @@
 
 #include "MathUtil.cginc"
 
-//Each channel contains successively-high summed-octave-noise frequency,
-//in this case Worley noise. We take a linear combination,
-//with more weight to the lower-frequency noise.
+/// Each channel contains successively-high summed-octave-noise frequency,
+/// in this case Worley noise. We take a linear combination,
+/// with more weight to the lower-frequency noise.
 float UnpackOctaves(float3 packed)
 {
 	return (packed.r * .625) + (packed.g * 0.25) + (packed.b * 0.125);
 }
 
-//Remap a Perlin-Worley noise (in R channel) with mutliple octaves of fractal Worly noise (in GBA channels)
-//to create the base cloud density volume noise.
-//Add additional density offset to the Perlin-Worley noise before remapping to uniformly increase or decrease the density.
+/// Remap a Perlin-Worley noise (in R channel) with mutliple octaves of fractal Worly noise (in GBA channels)
+/// to create the base cloud density volume noise.
+/// Add additional density offset to the Perlin-Worley noise before remapping to uniformly increase or decrease the density.
 float UnpackPerlinWorleyBaseNoise(half4 baseNoiseValue, float densityOffset)
 {
 	baseNoiseValue.r = max(0, baseNoiseValue.r - densityOffset) / (1 - densityOffset);
