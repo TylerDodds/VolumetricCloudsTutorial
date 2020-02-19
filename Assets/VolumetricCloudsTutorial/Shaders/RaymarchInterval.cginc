@@ -17,19 +17,24 @@
 #define MAX_NUM_STEPS 64
 #endif
 
-int GetNumberOfSteps(float distance, float3 worldMarchDirection)
+
+/// Gets the number of steps based on TARGET_STEP_SIZE,
+/// clamped between MIN_NUM_STEPS and MAX_NUM_STEPS.
+int GetNumberOfSteps(float distance)
 {
 	int numSteps = distance / TARGET_STEP_SIZE;
 	return min(max(numSteps, MIN_NUM_STEPS), MAX_NUM_STEPS);
 }
 
+/// From a camera view ray, get the raymarch interval (start position, distance to raymarch, and distance to start position)
+/// based on a flat slab of clouds (as though assuming world is flat).
 bool GetCloudRaymarchInterval_Flat(float3 viewRayStart, float3 viewRayDirection, out float3 raymarchStart, out float raymarchDistance, out float distanceToTarget)
 {
 	float targetHeight = clamp(viewRayStart.y, cloudHeight, cloudHeight + cloudSlabHeight);
 	float targetDifference = targetHeight - viewRayStart.y;
 	distanceToTarget = targetDifference / viewRayDirection.y;
 	raymarchStart = viewRayStart + distanceToTarget * viewRayDirection;
-	float slabMarchEndHeight = cloudHeight + (viewRayDirection.y > 0 ? cloudSlabHeight : 0);//TODO optimize this instruction set?
+	float slabMarchEndHeight = cloudHeight + (viewRayDirection.y > 0 ? cloudSlabHeight : 0);
 	raymarchDistance = (slabMarchEndHeight - raymarchStart.y) / viewRayDirection.y;
 
 	bool inInterval = (sign(distanceToTarget) < 0 || distanceToTarget > fadeMaxDistance);
@@ -37,6 +42,9 @@ bool GetCloudRaymarchInterval_Flat(float3 viewRayStart, float3 viewRayDirection,
 	return inInterval;
 }
 
+/// Gets the intersection of a ray and a sphere, returning false if no intersection, and true if there is an intersection.
+/// If true, t1 and t2 return the distances of the two intersection points along the ray, and may be negative
+/// if the intersection happens behind the ray, but on the line that it defines.
 bool GetRaySphereIntersection(float3 rayPosition, float3 rayDirection, float3 sphereCenter, float radius, out float t1, out float t2)
 {
 	float3 offset = rayPosition - sphereCenter;
@@ -53,6 +61,8 @@ bool GetRaySphereIntersection(float3 rayPosition, float3 rayDirection, float3 sp
 	return false;
 }
 
+/// From a camera view ray, get the raymarch interval (start position, distance to raymarch, and distance to start position)
+/// based on a spherical slab of atmosphere.
 bool GetCloudRaymarchInterval_EarthCurvature(float3 viewRayStart, float3 viewRayDirection, out float3 raymarchStart, out float raymarchDistance, out float distanceToTarget)
 {
 	float outer_t1, outer_t2, inner_t1, inner_t2;

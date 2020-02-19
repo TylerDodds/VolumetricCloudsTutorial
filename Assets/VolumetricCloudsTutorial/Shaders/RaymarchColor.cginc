@@ -3,6 +3,9 @@
 
 #include "UnityLightingCommon.cginc"
 
+/// From raymarch results of transmittance, integrated sun light intensity, integrated ambient light intensity, and average depth, 
+/// along with ambient light color,
+/// determine the final pixel color value.
 fixed4 RaymarchColorLitAnalyticalTransmittanceIntensity(float4 transmittanceAndIntensitiesAndDepth, fixed3 ambient)
 {
 	//Multiply sun color my intensity and ambient colour by density

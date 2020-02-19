@@ -15,6 +15,7 @@ struct v2f
 	float3 ray : TEXCOORD2;
 };
 
+/// Vertex program to load the main texture UV, depth UV, and camera view ray (packed into normals of the input).
 v2f vert(appdata_full v)
 {
 	v2f o;
