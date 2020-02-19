@@ -1,29 +1,30 @@
 ﻿#if !defined(VCT_FRAGMENT_RAYMARCHING_INCLUDED)
 #define VCT_FRAGMENT_RAYMARCHING_INCLUDED
 
+#include "UnityCG.cginc"
 #include "CloudConstants.cginc"
 #include "RaymarchInterval.cginc"
 #include "RaymarchIntegral.cginc"
 
 /// From pixel shader fragment information, reconstruct scene depth and view ray position for raymarching. 
 /// Get raymarch interval based on earth's size, and perform raymarching.
-float4 FragmentTransmittanceAndintegratedIntensityAndDepth(float2 uv_depth, float3 ray, float offset, sampler2D _CameraDepthTexture, out float3 worldSpaceFragment, out float3 worldSpaceDirection)
+float4 FragmentTransmittanceAndIntegratedIntensityAndDepth(float2 uv_depth, float3 ray, float offset, sampler2D _CameraDepthTexture, out float3 worldSpaceDirection)
 {
 	float3 startPos = _WorldSpaceCameraPos + ray;
 	worldSpaceDirection = normalize(ray);
 	// Reconstruct world space position & direction towards this screen pixel.
 	float zsample = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv_depth);
+	#if UNITY_REVERSED_Z
 	if (zsample > 0)
+	#else
+	if (zsample < 1)
+	#endif
 	{
-		worldSpaceFragment = _WorldSpaceCameraPos;
 		return float4(1, 0, 0, _farDepth);
 		//TODO use Linear01Depth as raymarch stopping criterion instead
 	}
-
+	
 	float depth = Linear01Depth(zsample * (zsample < 1.0));
-
-	float3 cameraToFragmentInWorldCoordinates = ray * depth;
-	worldSpaceFragment = _WorldSpaceCameraPos + cameraToFragmentInWorldCoordinates;
 
 	float3 raymarchStart;
 	float raymarchDistance, cloudHeightDistance;
