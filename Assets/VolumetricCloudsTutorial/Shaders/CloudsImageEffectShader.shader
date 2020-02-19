@@ -20,9 +20,9 @@
 	{
 		half4 sceneColor = tex2D(_MainTex, i.uv);
 
-		float3 worldSpaceDirection, worldSpaceFragment;
+		float3 worldSpaceDirection;
 		const float offset = 0;
-		float4 transmittanceAndintegratedIntensityAndDepth = FragmentTransmittanceAndintegratedIntensityAndDepth(i.uv_depth, i.ray, offset, _CameraDepthTexture, worldSpaceFragment, worldSpaceDirection);
+		float4 transmittanceAndintegratedIntensityAndDepth = FragmentTransmittanceAndIntegratedIntensityAndDepth(i.uv_depth, i.ray, offset, _CameraDepthTexture, worldSpaceDirection);
 
 		fixed3 ambient = unity_AmbientSky;//TODO Expose this property instead of using, unity_AmbientSky
 
