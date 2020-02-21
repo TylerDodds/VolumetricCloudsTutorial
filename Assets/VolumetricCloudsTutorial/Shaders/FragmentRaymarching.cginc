@@ -8,6 +8,7 @@
 
 /// From pixel shader fragment information, reconstruct scene depth and view ray position for raymarching. 
 /// Get raymarch interval based on earth's size, and perform raymarching.
+/// Returns transmittance, sun intensity fraction, ambient intensity fraction
 float4 FragmentTransmittanceAndIntegratedIntensityAndDepth(float2 uv_depth, float3 ray, float offset, sampler2D _CameraDepthTexture, out float3 worldSpaceDirection)
 {
 	float3 startPos = _WorldSpaceCameraPos + ray;
