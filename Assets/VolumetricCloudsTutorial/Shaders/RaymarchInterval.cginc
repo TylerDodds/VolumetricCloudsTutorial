@@ -105,7 +105,7 @@ bool GetCloudRaymarchInterval_EarthCurvature(float3 viewRayStart, float3 viewRay
 	}
 	else
 	{
-		//Must be inside atmosphere
+		//Must be inside atmosphere or outside of it, where ray passes only through shell, not into inner sphere
 		distanceToTarget = max(outer_t1, 0);
 		raymarchDistance = outer_t2 - distanceToTarget;
 	}

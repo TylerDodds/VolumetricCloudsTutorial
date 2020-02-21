@@ -75,7 +75,8 @@ If there is an object in front of the clouds, we set the cloud fragment
 to empty: it has transmittance 1, intensity 0, and a far depth.
 
 Additionally, if the world-space direction of the view ray is negative in `y`,
-then we know it is pointing below the horizon, so we will have no clouds for
+then we know it is pointing below the horizon.
+As discussed in [Raymarch Fading](#raymarch-fading), we will have no clouds for
 this pixel, again setting the cloud fragment to empty.
 
 Finally, we check the raymarch extents (discussed below) by determining where
@@ -102,7 +103,7 @@ between MIN_NUM_STEPS and MAX_NUM_STEPS.
 Here, we represent the atmosphere as a horizontal slab of uniform height.
 
 We perform simple
-https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection[Line-Plane Intersection]
+[Line-Plane Intersection](https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection)
 with two vertical planes (normal vector along `y`) representing the bottom and
 top of the slab. Based on the sign of the y-component of the view
 direction, we know which plane we expect to hit first.
@@ -116,7 +117,7 @@ Determines if the ray intersects the sphere, and the two distances along the ray
 skims the edge of the sphere, these will be different.
 
 This is essentially
-https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection[Line-Sphere Intersection],
+[Line-Sphere Intersection](https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection),
 but where the sign of the distances from the ray start position matters.
 
 When both are negative, there is no intersection (ray is outside of the sphere
@@ -136,7 +137,7 @@ If the ray does not intersect with the outer sphere, or the intersection is
 completely behind the ray (both distances negative), then the ray is completely
 outside the atmosphere, pointing away, and does not intersect.
 
-Otherwise, if the ray does intersect with the inner sphere, then the ray must
+Otherwise, if the ray does not intersect with the inner sphere, then the ray must
 exit out of the outer sphere in front of it, _possibly_ also entering the outer
 sphere first. We have the raymarch range as
 `[max(0, intersection_1), intersection_2]`.
@@ -155,11 +156,33 @@ range is `[outer_intersection_1, inner_intersection_1]`. If the first outer sphe
 is behind the ray, then we are in the last remaining case: inside the slab,
 pointing toward the inner sphere. The range is `[0,inner_intersection_1]`.
 
-TODO
-
 ### Raymarch Fading
 
-TODO
+Raymarching is expensive. The more pixels we need to do raymarching for, and
+the further distance we need to raymarch for, the longer it will take.
+
+First, we will not perform raymarching if the view direction is below the
+horizontal in world space. For most game level designs, this will be a safe
+assumption: looking directly down, the player will be looking into the ground or
+floor, and at the horizon there will be other elements in the distance
+(buildings, hills, etc) to cover up the clouds there.
+
+We will begin fading out the clouds when the view vector is horizontal, and stop
+performing raymarching  completely at some small angle below that. Recall that
+these  clouds will be far away due to the Earth's curvature, so the effect is to
+fade out clouds based on distance.
+
+Additionally, we will only perform raymarching up to a certain distance from the
+beginning of the atmosphere. Otherwise, we are faced with the choice to keep the
+step size the  same (leading to more steps and longer execution time), or keep
+the maximum step size (leading to larger steps and poorer quality).
+By taking `raymarchDistance = min(raymarchDistance, maxRaymarchDistance)`, we
+can keep the step size and number under control.
+
+We note again that this scenario is most prevalent near the horizon, where we
+are looking through a larger portion of the atmosphere than looking
+straight up. For such far-away clouds, capturing the closer-by portion is
+good enough. 
 
 ## Raymarching Math
 
