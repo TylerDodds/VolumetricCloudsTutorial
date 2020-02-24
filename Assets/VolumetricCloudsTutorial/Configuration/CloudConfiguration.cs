@@ -35,6 +35,10 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> The packed noise texture used for the base cloud density. </summary>
         public Texture3D BaseDensityPerlinWorleyNoisePacked { get { return _baseDensityPerlinWorleyNoisePacked; } }
 
+        [Header("Lighting")]
+        [SerializeField] Color _ambientColor = new Color(.8f, .8f, .8f);
+        public Color AmbientColor { get { return _ambientColor; } }
+
         /// <summary> Sets cloud shader properties for the given material based on the configuration values. </summary>
         public void SetMaterialProperties(Material material)
         {
@@ -47,6 +51,8 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_SigmaExtinction", SigmaExtinction);
             material.SetFloat("_SigmaScattering", SigmaScattering);
             material.SetFloat("_CloudDensityOffset", CloudDensityOffset);
+
+            material.SetColor("_AmbientColor", AmbientColor);
         }
     }
 }
