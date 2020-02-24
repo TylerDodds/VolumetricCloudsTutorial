@@ -5,9 +5,9 @@
 
 uniform sampler3D _BaseDensityNoise;
 
-uniform float _CloudWeatherScale = 1;//TODO value & parametrize
-uniform float _BaseTexTile = 1;//TODO value & parametrize
-uniform float _densityOffset = 0;//TODO value & parametrize
+uniform float _CloudScale = 1;
+uniform float _BaseDensityTiling = 1;
+uniform float _CloudDensityOffset = 0;
 
 /// Determines the fraction within the atmosphere's height,
 /// given a height value.
@@ -75,9 +75,9 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	//Get weather data.
 	//TODO get weather data: coverage, wetness, cloud type, density and erosion
 
-	float3 baseUv = animatedPos / _CloudWeatherScale * _BaseTexTile;
+	float3 baseUv = animatedPos / _CloudScale * _BaseDensityTiling;
 	float4 baseNoiseValue = tex3Dlod(_BaseDensityNoise, float4(baseUv, 0));
-	float density = UnpackPerlinWorleyBaseNoise(baseNoiseValue, _densityOffset);
+	float density = UnpackPerlinWorleyBaseNoise(baseNoiseValue, _CloudDensityOffset);
 
 	//TODO apply weather density, coverage, and erosion
 	erosion = 0;

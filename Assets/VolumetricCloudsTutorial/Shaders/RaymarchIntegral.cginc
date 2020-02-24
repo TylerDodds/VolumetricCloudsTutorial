@@ -7,8 +7,8 @@
 
 static const float _opaqueCutoff = 0.005;
 static const float _wetIntensityFraction = 0.3;//TODO parametrize
-uniform float _SigmaExtinction = 0.1;//TODO value & parametrize
-uniform float _SigmaScattering = 0.1;//TODO value & parametrize
+uniform float _SigmaExtinction = 0.1;
+uniform float _SigmaScattering = 0.1;
 
 /// Returns transmittance, sun intensity fraction, ambient intensity fraction, and depth for a given
 /// raymarch starting positiong and direction, raymarch distance, view vector start position, and offset along the ray.
