@@ -5,6 +5,8 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - _shader: {fileID: 4800000, guid: 8da0d0a83ce12c34ba71ae5164c73275, type: 3}
+  - _cloudConfiguration: {fileID: 11400000, guid: 96a1d51134d8eed47a214930344ff6e2,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

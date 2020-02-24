@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using VolumetricCloudsTutorial.Configuration;
 
 namespace VolumetricCloudsTutorial.ImageEffects
 {
@@ -9,13 +10,18 @@ namespace VolumetricCloudsTutorial.ImageEffects
     [RequireComponent(typeof(Camera))]
     public class CloudsImageEffect : Base.ImageEffectBase
     {
+        [SerializeField] private CloudConfiguration _cloudConfiguration;
+
         /// <summary>
         /// Update the image effect's Material before rendering
         /// </summary>
         /// <param name="material">The Material to update</param>
         protected override void UpdateMaterial(Material material)
         {
-            //TODO Update from configuration
+            if (_cloudConfiguration != null)
+            {
+                _cloudConfiguration.SetMaterialProperties(material);
+            }
         }
 
         /// <summary>
