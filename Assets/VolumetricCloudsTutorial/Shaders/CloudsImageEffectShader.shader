@@ -13,6 +13,7 @@
 	#include "NoiseTextureUtil.cginc"
 
 	sampler2D_float _CameraDepthTexture;
+	uniform float4 _AmbientColor;
 
 	/// Perform raymarching in the view direction to determine transmittance and intensity, 
 	/// then find final pixel color.
@@ -24,7 +25,7 @@
 		const float offset = 0;
 		float4 transmittanceAndintegratedIntensityAndDepth = FragmentTransmittanceAndIntegratedIntensityAndDepth(i.uv_depth, i.ray, offset, _CameraDepthTexture, worldSpaceDirection);
 
-		fixed3 ambient = unity_AmbientSky;//TODO Expose this property instead of using, unity_AmbientSky
+		fixed3 ambient = _AmbientColor;
 
 		float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(transmittanceAndintegratedIntensityAndDepth, ambient);
 
