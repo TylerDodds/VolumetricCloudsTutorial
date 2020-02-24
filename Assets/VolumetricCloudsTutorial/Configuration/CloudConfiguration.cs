@@ -15,7 +15,7 @@ namespace VolumetricCloudsTutorial.Configuration
         public float CloudScale { get { return _cloudScaleKm * 1000; } }
 
         [Header("Shape")]
-        [SerializeField] float _baseDensityTiling = 1;
+        [SerializeField] float _baseDensityTiling = 2;
         /// <summary> Tiling of the base density noise relative to the <see cref="CloudScale"/>. </summary>
         public float BaseDensityTiling { get { return _baseDensityTiling; } }
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CloudConfigurationAsset
   m_EditorClassIdentifier: 
   _cloudScaleKm: 38
-  _baseDensityTiling: 1
+  _baseDensityTiling: 2
   _sigmaExtinction: 0.08
   _sigmaScattering: 0.08
   _cloudDensityOffset: 0.3

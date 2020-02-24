@@ -82,6 +82,8 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	//TODO apply weather density, coverage, and erosion
 	erosion = 0;
 
+	density *= 0.001;//TODO until rest of density & lighting calculations are performed, use a lower base density so clouds are not effectively opaque
+
 	return density;
 }
 
