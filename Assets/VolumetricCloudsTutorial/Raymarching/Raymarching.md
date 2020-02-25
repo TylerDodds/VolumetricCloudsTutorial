@@ -182,8 +182,98 @@ can keep the step size and number under control.
 We note again that this scenario is most prevalent near the horizon, where we
 are looking through a larger portion of the atmosphere than looking
 straight up. For such far-away clouds, capturing the closer-by portion is
-good enough. 
+good enough.
 
-## Raymarching Math
+## Raymarching Math (`RaymarchIntegral.cginc`)
+
+### Overview
+
+We are interested in determining what happens to light as it passes through the
+clouds, which is termed as
+[participating media](http://old.cescg.org/CESCG-2000/SMaierhofer/node6.html).
+Namely, it is a volume through which light is either absorbed, transmitted, or
+scattered.
+
+For each of these processes, we will be concerned with determining the
+appropriate associated quantity. In this situation, these quantities are all
+with reference to a particular volume (or sub-volume) of cloud, and are often
+determined for light passing between to or from a particular point inside the
+volume.
+
+* [Transmittance](https://en.wikipedia.org/wiki/Transmittance):
+the fraction of incident light that is transmitted.
+* [Scattering](https://en.wikipedia.org/wiki/Scattering):
+the fraction of light that is absorbed and re-emitted in a different directions
+(depends on initial and final light direction).
+* [Absorption](https://en.wikipedia.org/wiki/Absorption_(electromagnetic_radiation)):
+the fraction of incident light that is taken up by the medium without re-emission.
+
+We note that both scattering and absorption are both responsible for the
+[_attenuation_](https://en.wikipedia.org/wiki/Attenuation) or _extinction_ of
+light. All of these fractions, defined over the same volume, add to 1; in
+particular, transmittance and attenuation add to 1.
+
+Clouds are a special case where the scattering is so high that we can assume
+that all of the attenuation comes from scattering, and ignore the amount coming
+from absorption.
+
+For each step in the raymarching, we need to determine at that point:
+1. The transmittance of light coming from the sun arriving at that point.
+2. The scattering of that light from the sun to the direction of the camera.
+3. The transmittance of that remaining light from that point to the camera.
+
+We note that steps 1 and 3 involve the same calculation for transmittance.
+
+### Determining Transmittance
+
+The [Beer-Lambert](https://en.wikipedia.org/wiki/Beer%E2%80%93Lambert_law)
+can be used to determine the attenuation (equivalently, the transmittance) of
+light through a material.
+
+The transmittance T = exp(-&tau;), where &tau; is the _optical depth_
+&int;<sub>0</sub><sup>L</sup>&sigma;(z)dz. The integral is performed over the
+line for which the transmittance is calculated.
+
+The _attenuation coefficient_ &sigma; is something we'll be parametrizing,
+rather than attempting to determine from measured values. Since the scattering
+and absorption within a cloud is due to the density of particles within the
+cloud, &sigma; will be proportional to the cloud density:
+&sigma;(z) = density * &sigma;<sub>E</sub>. Here, we'll parametrize the
+_extinction coefficient_ &sigma;<sub>E</sub>. We'll note that units of &sigma;
+should be 1 / meters so that the optical depth is unitless, so that
+&sigma;<sub>E</sub> is a
+[mass attenuation coefficient](https://en.wikipedia.org/wiki/Mass_attenuation_coefficient)
+with units m^2 / kg.
+
+However, when we consider the cloud density (see
+[CloudDensity](../CloudDensity.md)) and &sigma;<sub>E</sub> values, we will be
+ignoring these units, and consider cloud density to range from 0 to 1. We will
+then parameterize &sigma;<sub>E</sub> to achieve clouds with the desired look.
+
+### RaymarchTransmittanceAndIntegratedIntensityAndDepth
+
+Input Parameters:
+
+* `float3 raymarchStart`: Starting position of raymarching in world space
+* `float3 worldDirection`: Direction of raymarching in world space
+* `float distance`: Distance to perform raymarching for
+* `float3 startPos`: Starting position of ray from camera (for depth calculation)
+* `float offset`: Initial offset of raymarching along the raymarch direction.
+This is left configurable and different from `raymarchStart` so that it can be
+used to define a per-pixel offset later.
+
+Output:
+
+Returns a `float4` that contains packed values in the four channels:
+
+* `r`: The transmittance of light coming from the _end_ of the raymarching to
+the camera. If the transmittance of the fraction of this background light making
+it through the cloud to the camera, then (1 - Transmittance) is the _opacity_
+(or alpha value) of the pixel.
+* `g`: The total intensity of light scattered from the sun through all points
+to the camera. Ignoring atmospheric effects, the sun light will be all of one
+color, so we need only to track the total intensity.
+* `b`:
+* `a`:
 
 TODO
