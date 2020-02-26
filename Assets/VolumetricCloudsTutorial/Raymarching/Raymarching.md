@@ -186,7 +186,7 @@ good enough.
 
 ## Raymarching Math (`RaymarchIntegral.cginc`)
 
-### Overview
+### Transmittance and Scattering Overview
 
 We are interested in determining what happens to light as it passes through the
 clouds, which is termed as
@@ -237,8 +237,8 @@ line for which the transmittance is calculated.
 The _attenuation coefficient_ &sigma; is something we'll be parametrizing,
 rather than attempting to determine from measured values. Since the scattering
 and absorption within a cloud is due to the density of particles within the
-cloud, &sigma; will be proportional to the cloud density:
-&sigma;(z) = density * &sigma;<sub>E</sub>. Here, we'll parametrize the
+cloud, &sigma; will be proportional to the cloud density &rho;:
+&sigma;(z) = &rho;(z) * &sigma;<sub>E</sub>. Here, we'll parametrize the
 _extinction coefficient_ &sigma;<sub>E</sub>. We'll note that units of &sigma;
 should be 1 / meters so that the optical depth is unitless, so that
 &sigma;<sub>E</sub> is a
@@ -249,6 +249,82 @@ However, when we consider the cloud density (see
 [CloudDensity](../CloudDensity.md)) and &sigma;<sub>E</sub> values, we will be
 ignoring these units, and consider cloud density to range from 0 to 1. We will
 then parameterize &sigma;<sub>E</sub> to achieve clouds with the desired look.
+
+### Raymarch Loop
+
+#### Transmittance
+
+We note that the full transmittance
+T = exp(-&int;<sub>0</sub><sup>L</sup>&sigma;(z)dz).
+We can divide the integral into portions:
+&int;<sub>0</sub><sup>L</sup>&sigma;(z)dz =
+&int;<sub>0</sub><sup>&Delta;z</sup>&sigma;(z)dz + ... +
+&int;<sub>L - &Delta;z</sub><sup>L</sup>&sigma;(z)dz.
+
+Thanks to [exponent laws](http://mathworld.wolfram.com/ExponentLaws.html),
+the exponential of the sum of integrals becomes a product of exponential of
+integrals:
+
+exp(-&int;<sub>0</sub><sup>L</sup>&sigma;(z)dz) =
+exp(-&int;<sub>0</sub><sup>&Delta;z</sup>&sigma;(z)dz) &Cross; ... &Cross;
+exp(-&int;<sub>L-&Delta;z</sub><sup>L</sup>&sigma;(z)dz).
+
+With this, we can see the structure of the raymarching loop. Each term in the
+product is the transmittance of light through that portion of the ray, while the
+_product_ of these terms, beginning from the left, determines the transmittance
+from the beginning of the ray (z = 0).
+
+A straightforward approximation to each individual transmittance term is to
+consider &sigma;(z) to be constant over the interval &Delta;z of the integral;
+for example,
+exp(-&int;<sub>a</sub><sup>a+&Delta;z</sup>&sigma;(z)dz) &asymp;
+exp(-&sigma;(a) &Delta;z) = exp(-&sigma;<sub>E</sub> &rho;(a) &Delta;z).
+
+Therefore, at each step, we determine the transmittance at that step as above,
+and can multiply it by the previous total transmittance to get the new total
+transmittance after the step. This forms the core of the raymarching loop.
+
+#### Scattering
+
+Besides transmittance, the other quantity interested in is the total amount of
+scattered light that will make it to the camera (equivalently, to the starting
+point of the raymarching, since we begin where the clouds start).
+
+Let's consider S(z) to be the amount of light scattered in the direction of the
+camera at position z along the raymarch; see [Lighting](Lighting.md) for more
+details. Then the total intensity is:
+
+S<sub>TOT</sub> = &int;<sub>0</sub><sup>L</sup>S(z)T<sub>0&rarr;z</sub> dz.
+
+We can also split this integral into steps:
+S<sub>TOT</sub> = &int;<sub>0</sub><sup>&Delta;z</sup>S(z)T<sub>0&rarr;z</sub>dz +
+... + &int;<sub>L-&Delta;z</sub><sup>L</sup>S(z)T<sub>0&rarr;z</sub>dz.
+
+Let's consider one of the chunks in the middle:
+&int;<sub>a</sub><sup>a+&Delta;z</sup>S(z)T(z)dz, where T(z) is the
+transmittance from 0 to z.
+For a small step ...
+
+TODO integrating scattered intensity
+
+However, as discussed in "Physically Based Sky, Atmosphere and Cloud Rendering
+in Frostbite" [Appendix C](https://blog.selfshadow.com/publications/s2016-shading-course/),
+this will not give an energy-conserving transmittance.
+The simple fix to this is ... (TODO)
+
+TODO
+
+#### Steps
+
+Starting at the initial raymarching position, we take steps in the raymarching
+direction as discussed in raymarching [setup](#setup). Given the known distance,
+we can determine a uniform step size. However, we may also choose to take
+larger steps in cases where the density is smaller, the transmittance is
+close to 1 through this portion, and the scattered light intensity is low,
+so we can afford more approximate calculations.
+
+
+TODO
 
 ### RaymarchTransmittanceAndIntegratedIntensityAndDepth
 
@@ -273,7 +349,10 @@ it through the cloud to the camera, then (1 - Transmittance) is the _opacity_
 * `g`: The total intensity of light scattered from the sun through all points
 to the camera. Ignoring atmospheric effects, the sun light will be all of one
 color, so we need only to track the total intensity.
-* `b`:
-* `a`:
+* `b`: The total intensity of _ambient_ light scattered through all points
+to the camera.
+* `a`: An estimate for the average depth of the clouds from the camera. This
+can be used as a rough estimate to determine a 3D of the clouds along the
+view ray.
 
 TODO
