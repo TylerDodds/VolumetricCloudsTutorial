@@ -301,18 +301,50 @@ S<sub>TOT</sub> = &int;<sub>0</sub><sup>&Delta;z</sup>S(z)T<sub>0&rarr;z</sub>dz
 ... + &int;<sub>L-&Delta;z</sub><sup>L</sup>S(z)T<sub>0&rarr;z</sub>dz.
 
 Let's consider one of the chunks in the middle:
-&int;<sub>a</sub><sup>a+&Delta;z</sup>S(z)T(z)dz, where T(z) is the
+S<sub>a</sub> = &int;<sub>a</sub><sup>a+&Delta;z</sup>S(z)T(z)dz, where T(z) is the
 transmittance from 0 to z.
-For a small step ...
-
-TODO integrating scattered intensity
+For a small step, we might consider approximating the integrand as constant,
+giving S<sub>a</sub> &asymp; S(a)T(a)&Delta;z. This is called the _midpoint_ or
+_rectangle_ rule in
+[numerical integration](https://en.wikipedia.org/wiki/Numerical_integration),
+and is the most straightforward, but poorest, method of approximation.
+We may choose other integration methods (ways to split up and weight evaluation
+of the integrand) that have higher accuracy.
 
 However, as discussed in "Physically Based Sky, Atmosphere and Cloud Rendering
 in Frostbite" [Appendix C](https://blog.selfshadow.com/publications/s2016-shading-course/),
 this will not give an energy-conserving transmittance.
-The simple fix to this is ... (TODO)
+The best way to see this is to consider that the integrand changes as a function
+of the depth z, even if we're assuming that the density is constant.
+In this case, the scattering S(z), depending only on the density, is constant,
+and we can approximate is as S(a). However, the transmittance is not,
+T(z) = exp(-&int;<sub>0</sub><sup>a</sup>&sigma;(x)dx -
+&int;<sub>a</sub><sup>z</sup>&sigma;(x)dx) for z between a and a+&Delta;z.
+Then we can again use exponent rules, so
+T(z) = T(a) &Cross; exp(-&int;<sub>a</sub><sup>z</sup>&sigma;(x)dx).
+Since we've approximated with constant density, now &sigma;(x) can be approximated
+as &sigma;(a), so T(z) &asymp; T(a) exp(-&int;<sub>a</sub><sup>z</sup>&sigma;(a)dx)
+= T(a) exp(-&sigma;(a)(z-a)) = T(a) exp(a&sigma;(a)) exp(-z&sigma;(a)).
+Most important to note is how this is exponentially decreasing with the distance
+z, even assuming constant density.
 
-TODO
+Then S<sub>a</sub> &asymp;
+&int;<sub>a</sub><sup>a+&Delta;z</sup> S(a) T(a) exp(a&sigma;(a)) exp(-z&sigma;(a)) dz
+= [S(a) T(a) exp(a&sigma;(a))] &int;<sub>a</sub><sup>a+&Delta;z</sup> exp(-z&sigma;(a)) dz.
+We can perform this integral of the exponential function analytically:
+&int;<sub>a</sub><sup>a+&Delta;z</sup> exp(-z&sigma;(a)) dz =
+[-exp(-z&sigma;(a))/&sigma;(a)]<sub>a</sub><sup>a+&Delta;z</sup> =
+exp(-a &sigma;(a)) - exp(-(&Delta;z+a)&sigma;(a)). Using exponent rules we pull out a
+constant factor: exp(-a &sigma;(a))[1 - exp(-&sigma;(a)&Delta;z)].
+
+Adding this to our previous approximation to S<sub>a</sub>, we have
+S(a) T(a) exp(a&sigma;(a)) exp(-a&sigma;(a)) [1 - exp(-&sigma;(a)&Delta;z)] =
+S(a) T(a) [1 - exp(-&sigma;(a)&Delta;z)].
+
+Note that we need to find -&sigma;(a)&Delta;z to update transmittance, and we
+have stored the previous value of T(a) from the last raymarch step, so to
+perform this approximation, we need only evaluate S(a)
+(see [Lighting](Lighting.md)).
 
 #### Steps
 
