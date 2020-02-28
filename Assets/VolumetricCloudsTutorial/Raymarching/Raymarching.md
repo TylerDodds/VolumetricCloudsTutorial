@@ -275,7 +275,8 @@ _product_ of these terms, beginning from the left, determines the transmittance
 from the beginning of the ray (z = 0).
 
 A straightforward approximation to each individual transmittance term is to
-consider &sigma;(z) to be constant over the interval &Delta;z of the integral;
+consider &sigma;(z) (equivalently, the density)
+to be constant over the interval &Delta;z of the integral;
 for example,
 exp(-&int;<sub>a</sub><sup>a+&Delta;z</sup>&sigma;(z)dz) &asymp;
 exp(-&sigma;(a) &Delta;z) = exp(-&sigma;<sub>E</sub> &rho;(a) &Delta;z).
@@ -345,6 +346,40 @@ Note that we need to find -&sigma;(a)&Delta;z to update transmittance, and we
 have stored the previous value of T(a) from the last raymarch step, so to
 perform this approximation, we need only evaluate S(a)
 (see [Lighting](Lighting.md)).
+
+#### Density vs. Opacity
+
+In other raymarching contexts, instead of sampling the _density_ of the medium,
+as we do here, instead what may be sampled is the color directly. In this case,
+the transmittance of each step is determined directly from the sampled opacity.
+This style of raymarching is often used to visualize volumetric data set.
+
+Recall from [Transmittance](#transmittance) that the transmittance through
+one raymarch step of size &Delta;z is exp(-&sigma;(a) &Delta;z).
+The opacity of the step is 1 - transmittance, the fraction of light that doesn't
+pass through from the background. Imagining a case of constant extinction coefficient
+&sigma;(z) and constant step size &Delta;z, the transmittance of each step is
+also constant, but depends on the step size we've chosen. In the similar case
+where we are given the (constant) opacity instead of extinction coefficient,
+the transmittance of each step must also depend on the chosen step size.
+
+Therefore, when one is sampling opacity values, there must also be a constant
+_reference length_ R<sub>L</sub> that determines the sampling rate corresponding
+to the opacity.
+
+TODO: Consider a sampled opacity value o, so 1 - o = t, the sampled transmittance,
+where the step size is the reference length.
+t = exp(-&sigma; R<sub>L</sub>). Then over this step,
+&sigma; = - ln(t) R<sub>L</sub>.
+Imagining we've sampled over some other step size &Delta;z, the transmittance
+with the equivalent extinction coefficient is
+exp(-&sigma; &Delta;z) = exp(-&sigma; R<sub>L</sub> (&Delta;z/R<sub>L</sub>)).
+Using the exponent power rule, this is
+exp(-&sigma; R<sub>L</sub>)<sup>(&Delta;z/R<sub>L</sub>)</sup>
+= t<sup>(&Delta;z/R<sub>L</sub>)</sup>.
+
+So, for sampled opacity values o, after correcting for step size,
+o = 1 - (1 - o)<sup>(&Delta;z/R<sub>L</sub>)</sup>.
 
 #### Steps
 
