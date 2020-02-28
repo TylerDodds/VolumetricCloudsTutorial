@@ -367,7 +367,7 @@ Therefore, when one is sampling opacity values, there must also be a constant
 _reference length_ R<sub>L</sub> that determines the sampling rate corresponding
 to the opacity.
 
-TODO: Consider a sampled opacity value o, so 1 - o = t, the sampled transmittance,
+Consider a sampled opacity value o, so 1 - o = t, the sampled transmittance,
 where the step size is the reference length.
 t = exp(-&sigma; R<sub>L</sub>). Then over this step,
 &sigma; = - ln(t) R<sub>L</sub>.
@@ -422,4 +422,14 @@ to the camera.
 can be used as a rough estimate to determine a 3D of the clouds along the
 view ray.
 
-TODO
+In addition to integrating the sun light scattering intensity, we do the same for
+ambient light intensity. Since we are only performing a single-scattering
+approximation for the sun's light, we need to take additional steps to
+recover the desired lighting look (see [Lighting](Lighting.md)).
+
+Finally, at each step we find the distance of that point from the camera,
+and add it to a weighted average depth. The weight is proportional to
+(1 - Transmittance) for that step, so we calculate something like a 'center of mass'
+or 'center of opacity' for the clouds along this direction. We'll use this if
+we need to choose a single point along this ray where we consider the clouds to
+be centered.
