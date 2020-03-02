@@ -8,6 +8,7 @@ uniform sampler3D _BaseDensityNoise;
 uniform float _CloudScale = 1;
 uniform float _BaseDensityTiling = 1;
 uniform float _CloudDensityOffset = 0;
+uniform float4 _WindStrengthAndSkew = float4(0, 0, 0, 0);
 
 /// Determines the fraction within the atmosphere's height,
 /// given a height value.
@@ -52,7 +53,9 @@ float DistanceFraction(float3 worldPos)
 /// Determines effective position to sample a cloud from, given initial world position and height fraction within cloud atmosphere.
 float3 ApplyWind(float3 worldPos, float heightFraction)
 {
-	//TODO apply wind
+	// We also skew clouds in the direction of the wind the higher they are
+	worldPos.xz -= heightFraction * _WindStrengthAndSkew.xz * _WindStrengthAndSkew.w;
+	worldPos.xyz -= _WindStrengthAndSkew.xyz * _Time.y;
 	return worldPos;
 }
 

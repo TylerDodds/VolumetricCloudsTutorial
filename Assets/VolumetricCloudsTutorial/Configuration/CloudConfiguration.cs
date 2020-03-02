@@ -13,6 +13,15 @@ namespace VolumetricCloudsTutorial.Configuration
         [SerializeField] float _cloudScaleKm = 38.0f;
         /// <summary> Overall scale of the clouds pattern. </summary>
         public float CloudScale { get { return _cloudScaleKm * 1000; } }
+        [SerializeField] Vector3 _windDirection = new Vector3(1, 0.4f, -1);
+        /// <summary> Overall direction of the wind. </summary>
+        public Vector3 WindDirection { get { return _windDirection; } }
+        [SerializeField] float _windStrength = 100f;
+        /// <summary> Strength multiplier for the wind. </summary>
+        public float WindStrength { get { return _windStrength; } }
+        [SerializeField] [Range(0, 1)] float _windHeightSkewFactor = 0.8f;
+        /// <summary> Factor for how clouds are skewed in the wind direction, depending on height. </summary>
+        public float WindHeightSkewFactor { get { return _windHeightSkewFactor; } }
 
         [Header("Shape")]
         [SerializeField] float _baseDensityTiling = 2;
@@ -45,6 +54,7 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetTexture("_BaseDensityNoise", BaseDensityPerlinWorleyNoisePacked);
 
             material.SetFloat("_CloudScale", CloudScale);
+            material.SetVector("_WindStrengthAndSkew", new Vector4(WindDirection.x, WindDirection.y, WindDirection.z, WindHeightSkewFactor) * WindStrength);
 
             material.SetFloat("_BaseDensityTiling", BaseDensityTiling);
 
