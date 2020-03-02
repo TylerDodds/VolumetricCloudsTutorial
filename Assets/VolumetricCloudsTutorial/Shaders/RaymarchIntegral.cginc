@@ -57,7 +57,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart,
 				transmittanceIntensitiesDepthAccumulator.b += integratedIntensityAmbient * extinctionToCamera;
 				transmittanceIntensitiesDepthAccumulator.r *= transmittance;
 
-				float depthWeight = (1 - transmittance);//TODO Instead of just extinctionToCamera, also multiply by (1-transmittance), namely this 'slice' opacity? or by contributions to either intensity?
+				float depthWeight = (1 - transmittance);
 				transmittanceIntensitiesDepthAccumulator.w += depthWeight * length(worldMarchPos - startPos);
 				depthWeightSum += depthWeight;
 			}

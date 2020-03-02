@@ -62,7 +62,7 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 
 	float distanceFraction = DistanceFraction(posBeforeAnimation);
 	heightFraction = HeightFraction(posBeforeAnimation);
-	if (heightFraction < 0 || heightFraction > 1 || distanceFraction >= 0.8)
+	if (heightFraction < 0 || heightFraction > 1 || distanceFraction >= 1)
 	{
 		wetness = 0;
 		animatedPos = pos;
