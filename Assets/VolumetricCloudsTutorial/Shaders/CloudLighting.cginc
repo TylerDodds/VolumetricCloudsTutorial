@@ -5,7 +5,7 @@
 /// intensity of scattered light from the sun through this point to the camera.
 float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float baseDensity, float stepSize)
 {
-	return 1;//TODO lighting calculations
+	return 0;//TODO lighting calculations
 }
 
 #endif // VCT_CLOUD_LIGHTING_INCLUDED

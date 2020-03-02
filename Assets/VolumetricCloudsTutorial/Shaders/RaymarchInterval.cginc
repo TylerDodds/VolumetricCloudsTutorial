@@ -32,12 +32,12 @@ bool GetCloudRaymarchInterval_Flat(float3 viewRayStart, float3 viewRayDirection,
 {
 	float targetHeight = clamp(viewRayStart.y, cloudHeight, cloudHeight + cloudSlabHeight);
 	float targetDifference = targetHeight - viewRayStart.y;
-	distanceToTarget = targetDifference / viewRayDirection.y;
+	distanceToTarget = max(0, targetDifference / viewRayDirection.y);
 	raymarchStart = viewRayStart + distanceToTarget * viewRayDirection;
 	float slabMarchEndHeight = cloudHeight + (viewRayDirection.y > 0 ? cloudSlabHeight : 0);
 	raymarchDistance = (slabMarchEndHeight - raymarchStart.y) / viewRayDirection.y;
 
-	bool inInterval = (sign(distanceToTarget) < 0 || distanceToTarget > fadeMaxDistance);//TODO -- is this correct? Handle y = 0 case, and inside the cloud case
+	bool inInterval = raymarchDistance > 0;
 	raymarchDistance = min(raymarchDistance, maxRaymarchDistance);
 	return inInterval;
 }

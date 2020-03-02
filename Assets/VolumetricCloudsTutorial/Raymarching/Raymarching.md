@@ -108,7 +108,11 @@ with two vertical planes (normal vector along `y`) representing the bottom and
 top of the slab. Based on the sign of the y-component of the view
 direction, we know which plane we expect to hit first.
 
-TODO
+We take the maximum of 0 and the distance to this plane to get the distance
+along the view direction to the start of our raymarch. Then by finding the
+distance of the second plane from this starting position, we determine the
+distance we need to raymarch. If this is negative, then the ray does not hit
+the atmosphere.
 
 #### `GetRaySphereIntersection(float3 rayPosition, float3 rayDirection, float3 sphereCenter, float radius, ...)`
 
@@ -389,7 +393,6 @@ we can determine a uniform step size. However, we may also choose to take
 larger steps in cases where the density is smaller, the transmittance is
 close to 1 through this portion, and the scattered light intensity is low,
 so we can afford more approximate calculations.
-
 
 TODO
 
