@@ -111,11 +111,26 @@ TODO
 
 ### Atmosphere
 
-TODO
+We assume that clouds exist only within some vertical slab within the atmosphere,
+so their density is zero elsewhere. We can therefore perform raymarching only
+within these extents; see the [Raymarching](../Raymarching/Raymarching.md) page
+for details.
 
 ### Weather
 
 TODO
+
+### Wind
+
+We approximate the effect of wind during raymarching by sampling the density
+from a world-space coordinate that has been shifted by the wind strength,
+proportional to the time.
+
+We also skew this coordinate further in the direction of the wind the higher
+it is, to approximate how clouds are observed to be affected by the wind.
+See this presentation on the
+[Nubis system](https://www.guerrilla-games.com/read/nubis-authoring-real-time-volumetric-cloudscapes-with-the-decima-engine)
+for details.
 
 ## Density From Coverage
 
