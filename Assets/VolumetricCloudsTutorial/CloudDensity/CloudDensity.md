@@ -93,7 +93,9 @@ See the [NoiseTextures](NoiseTextures/NoiseTextures.md) page for details on how
 to process and unpack all four channels of this texture to obtain the base
 density.
 
-TODO
+See the [Cloud Coverage](#cloud-coverage) section for information on how we
+approximate the effect of weather on this noise-based density before
+determining the detail density.
 
 ### Detail Density
 
@@ -103,7 +105,27 @@ TODO
 
 TODO
 
-### Combined Density
+## Weather
+
+At an even larger scale than the cloud [base density](#base-density), we provide
+an additional user-generated texture that describes the large-scale weather
+conditions. In principle, this is a texture that could be updated in real time
+based on a weather simulation, but for simplicity we will consider textures
+we can easily author ourselves in any image editing program.
+
+The weather texture will describe the changing weather conditions horizontally,
+so we will use the x and z coordinates at any given raymarch point to look up
+the weather values from the texture.
+
+The weather texture will hold the following three values, packed into the R, G
+and B channels, respectively:
+
+* Coverage: the fraction of full cloud coverage, affecting the base density.
+* Wetness: the fraction of full wetness, affecting the lighting.
+* Type: parametrizes different cloud shapes, particularly their vertical density
+profile. Ranges from 0 to 1.
+
+
 
 TODO
 
@@ -115,10 +137,6 @@ We assume that clouds exist only within some vertical slab within the atmosphere
 so their density is zero elsewhere. We can therefore perform raymarching only
 within these extents; see the [Raymarching](../Raymarching/Raymarching.md) page
 for details.
-
-### Weather
-
-TODO
 
 ### Wind
 
@@ -132,6 +150,46 @@ See this presentation on the
 [Nubis system](https://www.guerrilla-games.com/read/nubis-authoring-real-time-volumetric-cloudscapes-with-the-decima-engine)
 for details.
 
-## Density From Coverage
+### Weather Coverage
+
+After taking into account atmosphere, wind, and [height coverage](#height-coverage),
+the base density is modified by the coverage value determined in the
+[Weather](#weather) section.
+
+We will mostly be considering the 'not covered' value, `1 - coverage`, since
+when coverage is 1 we will leave the base density as it is.  
+There are many ways we could apply this coverage value.
+One would be to use the `Remap` function:
+`Remap(density, 1 - coverage, 1, 0, 1)`. This would map the maximum density down
+to the value of `1 - coverage`.
+
+In our case, we will simply subtract: `density - (1 - coverage)`. One of the
+advantages will be that a negative density can help signal to the raymarching
+that it may begin to take larger steps. We can see the difference between these
+two approaches in the plot below, with the density in grey, coverage in red,
+remapped in green and subtracted in blue:
+
+![Cloud Coverage Density](Docs/CloudCoverageDensity.png "Cloud Coverage Density")
+
+The main difference is that the remapped version keeps the same peaks of the
+original density, while the subtracted version more uniformly follows the
+amount of coverage.
+
+Another visual effect we parametrize is to multiply the density by the coverage,
+which makes edges of the cloud wispier and tends to lighten them.
+
+TODO
+
+## Height
+
+### Height Coverage
+
+TODO
+
+### Height Erosion
+
+TODO
+
+## Final Density
 
 TODO
