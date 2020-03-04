@@ -11,6 +11,8 @@ uniform float _BaseDensityTiling = 1;
 uniform float _CloudDensityOffset = 0;
 uniform float4 _WindStrengthAndSkew = float4(0, 0, 0, 0);
 uniform float _CloudDensityCoverageMultiplier = 1;
+uniform float _CloudCoverageMultiplier = 1;
+uniform float _CloudCoverageMinimum = 0;
 
 uniform sampler2D _WeatherTex;
 
@@ -92,6 +94,11 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 
 	float4 weatherUV = float4(0.5 + posBeforeAnimation.xz / _WeatherScale, 0, 0);
 	float3 cloudCoverageWetnessType = tex2Dlod(_WeatherTex, weatherUV);
+	float coverage = cloudCoverageWetnessType.r;
+	coverage = RemapClamped(coverage * _CloudCoverageMultiplier.x, 0.0, 1.0, _CloudCoverageMinimum, 1.0);
+	//TODO anvil bias
+	coverage = min(coverage, 1 - distanceFraction);
+	wetness = cloudCoverageWetnessType.g;
 
 	float3 baseUv = animatedPos / _CloudScale * _BaseDensityTiling;
 	float4 baseNoiseValue = tex3Dlod(_BaseDensityNoise, float4(baseUv, 0));
@@ -99,7 +106,6 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 
 	//TODO apply weather density, coverage, and erosion
 	erosion = 0;
-	float coverage = 1;//TODO
 
 	density = DensityWithCoverage(density, coverage);
 
