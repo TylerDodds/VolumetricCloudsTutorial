@@ -107,6 +107,8 @@ TODO
 
 ## Weather
 
+### Weather Texture
+
 At an even larger scale than the cloud [base density](#base-density), we provide
 an additional user-generated texture that describes the large-scale weather
 conditions. In principle, this is a texture that could be updated in real time
@@ -125,9 +127,27 @@ and B channels, respectively:
 * Type: parametrizes different cloud shapes, particularly their vertical density
 profile. Ranges from 0 to 1.
 
+Some rough examples are available in the `WeatherTexture` folder, having been
+assembled with various noise patterns for each channel. They may be handcrafted
+to better achieve a particular look.
 
+### Coverage Modifications
 
-TODO
+We parametrize a multiplier fraction and minimum value for the cloud density
+determined from the weather texture, to provide and easier-to-access method to
+quickly change the overall density profile of the clouds.
+
+As discussed in the [Raymarching](../Raymarching/Raymarching.md) page, we fade
+out clouds by the horizon. When clouds are far away (therefore closer to the
+horizon), the visual effect can be very busy, and since potential raymarching
+distances are longer in those directions, performance can be effected.
+Therefore, we also fade out clouds based on horizontal distance _from the
+origin_. We calculate a fade fraction between two far-away distances, and
+then take also `min(coverage, 1 - distanceFraction)` after performing
+[height coverage](#height-coverage) modifications.
+
+This ensures that cloud coverage (and hence density) will uniformly go to zero
+once the further fade distance is reached.
 
 ## Cloud Coverage
 
@@ -175,10 +195,9 @@ The main difference is that the remapped version keeps the same peaks of the
 original density, while the subtracted version more uniformly follows the
 amount of coverage.
 
-Another visual effect we parametrize is to multiply the density by the coverage,
-which makes edges of the cloud wispier and tends to lighten them.
-
-TODO
+Another visual effect we apply is to multiply the density by the coverage,
+which makes edges of the cloud wispier and tends to lighten them. Again, we
+parametrize the strength of this effect so a target look can be easily achieved.
 
 ## Height
 

@@ -34,6 +34,14 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> Factor for how clouds are skewed in the wind direction, depending on height. </summary>
         public float WindHeightSkewFactor { get { return _windHeightSkewFactor; } }
 
+        [SerializeField] [Range(0, 1)] float _cloudCoverageModifier = 1f;
+        /// <summary> Multiplier for cloud coverage from weather texture. </summary>
+        public float CloudCoverageMultiplier { get { return _cloudCoverageModifier; } }
+
+        [SerializeField] [Range(0, 1)] float _cloudCoverageMin = 0.3f;
+        /// <summary> Minimum for cloud coverage from weather texture. </summary>
+        public float CloudCoverageMinimum { get { return _cloudCoverageMin; } }
+
         [SerializeField] [Range(0, 1)] float _cloudDensityCoverageMultiplier = 1f;
         /// <summary> Multiplier for cloud density when determining coverage modification. </summary>
         public float CloudDensityCoverageMultiplier { get { return _cloudDensityCoverageMultiplier; } }
@@ -74,6 +82,8 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_CloudScale", CloudScale);
             material.SetFloat("_WeatherScale", WeatherScale);
             material.SetVector("_WindStrengthAndSkew", new Vector4(WindDirection.x, WindDirection.y, WindDirection.z, WindHeightSkewFactor) * WindStrength);
+            material.SetFloat("_CloudCoverageMultiplier", CloudCoverageMultiplier);
+            material.SetFloat("_CloudCoverageMinimum", CloudCoverageMinimum);
             material.SetFloat("_CloudDensityCoverageMultiplier", CloudDensityCoverageMultiplier);
 
             material.SetFloat("_BaseDensityTiling", BaseDensityTiling);
