@@ -210,12 +210,15 @@ given point's height fraction within the atmosphere.
 
 By taking the coverage to some power less than 1, we can increase the coverage
 for large height fractions. To find this exponent, we'll again use `Remap`:
-`Remap(heightFraction, 0.7, 0.8, 1, anvilAmount)`, where
-`anvilAmount = lerp(1, 0.5, AnvilBias)`. So at height fraction 0.7, the
-power is 1, while at 0.8, the power is between 1 and 0.5, depending on the anvil
+`Remap(heightFraction, 0.7, 1.0, 1, 1 - AnvilBias)`. So at height fraction 0.7,
+the power is 1, while at 1.0, the power is between 1 and 0, depending on the anvil
 bias.
 
-TODO
+Note that large anvil bias values (very small powers) can cause the discretized
+nature of weather texture coverage values to become obvious. Note that these
+values will increment in steps of 1/255, due to 8-bit resolution of
+each channel. Taking a small power when these values are small, these steps
+can become noticeable.
 
 ### Height Coverage
 
