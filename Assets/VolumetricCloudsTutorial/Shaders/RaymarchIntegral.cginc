@@ -30,11 +30,11 @@ float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart,
 	float wetness;
 	float3 animatedPos;
 	float heightFraction, erosion;
-	baseDensityCurrent = GetBaseDensity(worldMarchPos, mipLod, wetness, animatedPos, heightFraction, erosion);
 
 	UNITY_LOOP
 		for (int step = 0; step < numSteps && currentOffset < offsetMax && transmittanceIntensitiesDepthAccumulator.r > _opaqueCutoff; step++)
 		{
+			baseDensityCurrent = GetBaseDensity(worldMarchPos, mipLod, wetness, animatedPos, heightFraction, erosion);
 			const float density = GetDetailDensity(worldMarchPos, animatedPos, heightFraction, mipLod, baseDensityCurrent, erosion);
 
 			if (density > 0)

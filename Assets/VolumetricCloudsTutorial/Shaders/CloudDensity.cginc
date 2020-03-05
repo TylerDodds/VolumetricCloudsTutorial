@@ -109,7 +109,7 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 
 	density = DensityWithCoverage(density, coverage);
 
-	density *= 0.001;//TODO until rest of density & lighting calculations are performed, use a lower base density so clouds are not effectively opaque
+	density *= 0.1;//TODO until rest of density & lighting calculations are performed, use a lower base density so clouds are not effectively opaque
 
 	return density;
 }
