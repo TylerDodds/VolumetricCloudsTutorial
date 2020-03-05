@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 438051fec1cb2a84caee5176aa7becfd, type: 3}
   m_Name: CloudConfigurationAsset
   m_EditorClassIdentifier: 
+  _weatherTexture: {fileID: 2800000, guid: ab092748e1ab93241ad07b98fdd04774, type: 3}
   _cloudScaleKm: 38
   _baseDensityTiling: 2
   _sigmaExtinction: 0.08

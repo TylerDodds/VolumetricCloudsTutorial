@@ -104,7 +104,7 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	float4 baseNoiseValue = tex3Dlod(_BaseDensityNoise, float4(baseUv, 0));
 	float density = UnpackPerlinWorleyBaseNoise(baseNoiseValue, _CloudDensityOffset);
 
-	//TODO apply weather density, coverage, and erosion
+	//TODO apply weather coverage, wetness, and erosion
 	erosion = 0;
 
 	density = DensityWithCoverage(density, coverage);
