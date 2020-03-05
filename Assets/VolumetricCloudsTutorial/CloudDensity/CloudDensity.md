@@ -201,6 +201,22 @@ parametrize the strength of this effect so a target look can be easily achieved.
 
 ## Height
 
+### Anvil Bias
+
+Some https://en.wikipedia.org/wiki/Cumulonimbus_incus[types] of clouds have a
+characteristic anvil shape, where the density starts to taper out from the top
+of the cloud. We will model this by changing the coverage value based on a
+given point's height fraction within the atmosphere.
+
+By taking the coverage to some power less than 1, we can increase the coverage
+for large height fractions. To find this exponent, we'll again use `Remap`:
+`Remap(heightFraction, 0.7, 0.8, 1, anvilAmount)`, where
+`anvilAmount = lerp(1, 0.5, AnvilBias)`. So at height fraction 0.7, the
+power is 1, while at 0.8, the power is between 1 and 0.5, depending on the anvil
+bias.
+
+TODO
+
 ### Height Coverage
 
 TODO
