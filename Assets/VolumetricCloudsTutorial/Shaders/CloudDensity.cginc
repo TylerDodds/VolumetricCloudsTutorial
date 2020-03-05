@@ -97,7 +97,7 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	float3 cloudCoverageWetnessType = tex2Dlod(_WeatherTex, weatherUV);
 	float coverage = cloudCoverageWetnessType.r;
 	coverage = RemapClamped(coverage * _CloudCoverageMultiplier.x, 0.0, 1.0, _CloudCoverageMinimum, 1.0);
-	coverage = pow(coverage, Remap(heightFraction, 0.7, 0.8, 1.0, lerp(1.0, 0.5, _AnvilBias)));
+	coverage = pow(coverage, Remap(heightFraction, 0.7, 1, 1.0, 1 - _AnvilBias));
 	coverage = min(coverage, 1 - distanceFraction);
 	wetness = cloudCoverageWetnessType.g;
 
