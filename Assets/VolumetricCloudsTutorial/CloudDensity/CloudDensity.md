@@ -201,6 +201,44 @@ parametrize the strength of this effect so a target look can be easily achieved.
 
 ## Height
 
+Clouds have significantly different density profiles over their height ranges,
+which we will look to model in three ways.
+
+The first two will parametrize the combined effect of height and cloud type
+upon the cloud shape. The first will be a simple multiplier for the base density,
+while the second will provide the erosion value for the detail density.
+Both will stored as a channel in a lookup texture, where the horizontal
+coordinate parametrizes the cloud type, and the vertical coordinate parametrizes
+the height fraction of the point in question.
+
+The third will uniformly affect the cloud coverage based on height, to achieve an
+anvil shape.
+
+### Height Density
+
+The density fraction will simply multiply the [base density][#base-density]
+we unpack from the noise textures.
+
+### Height Erosion
+
+The erosion value is applied to the effect of the detail noise textures upon
+the base density (with coverage applied).
+
+TODO
+
+### Density-Erosion Lookup Texture
+
+We'll use a fairly small 2D lookup texture with the density multiplier in the R
+channel and the erosion value in the G channel. Again, we'll generate this by
+hand in photo-editing software, following some guidelines from the
+[Nubis system](https://www.guerrilla-games.com/read/nubis-authoring-real-time-volumetric-cloudscapes-with-the-decima-engine),
+particularly regarding height distributions.
+
+With increasing cloud type, we'll paint from lower-lying, flat clouds
+(approximately stratus) to ones covering the full height of the atmosphere
+(approximately cumulonimbus). Erosion will generally be larger at
+higher altitudes, and not seen at all for the lower-lying clouds.
+
 ### Anvil Bias
 
 Some https://en.wikipedia.org/wiki/Cumulonimbus_incus[types] of clouds have a
@@ -219,14 +257,6 @@ nature of weather texture coverage values to become obvious. Note that these
 values will increment in steps of 1/255, due to 8-bit resolution of
 each channel. Taking a small power when these values are small, these steps
 can become noticeable.
-
-### Height Coverage
-
-TODO
-
-### Height Erosion
-
-TODO
 
 ## Final Density
 
