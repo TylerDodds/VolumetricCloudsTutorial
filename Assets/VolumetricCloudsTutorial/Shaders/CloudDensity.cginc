@@ -14,8 +14,10 @@ uniform float _AnvilBias = 0;
 uniform float _CloudDensityCoverageMultiplier = 1;
 uniform float _CloudCoverageMultiplier = 1;
 uniform float _CloudCoverageMinimum = 0;
+uniform float _CloudTypeMultiplier = 1;
 
 uniform sampler2D _WeatherTex;
+uniform sampler2D _DensityErosionTex;
 
 /// Determines the fraction within the atmosphere's height,
 /// given a height value.
@@ -100,10 +102,14 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	coverage = pow(coverage, Remap(heightFraction, 0.7, 1, 1.0, 1 - _AnvilBias));
 	coverage = min(coverage, 1 - distanceFraction);
 	wetness = cloudCoverageWetnessType.g;
+	float cloudType = saturate(cloudCoverageWetnessType.b * _CloudTypeMultiplier);
+
+	float2 densityErosion = tex2Dlod(_DensityErosionTex, float4(cloudType, heightFraction, 0.0, 0.0)).rg;
 
 	float3 baseUv = animatedPos / _CloudScale * _BaseDensityTiling;
 	float4 baseNoiseValue = tex3Dlod(_BaseDensityNoise, float4(baseUv, 0));
 	float density = UnpackPerlinWorleyBaseNoise(baseNoiseValue, _CloudDensityOffset);
+	density *= densityErosion.x;
 
 	//TODO apply weather coverage, wetness, and erosion
 	erosion = 0;

@@ -50,10 +50,18 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> Multiplier for cloud density when determining coverage modification. </summary>
         public float CloudDensityCoverageMultiplier { get { return _cloudDensityCoverageMultiplier; } }
 
+        [SerializeField] [Range(0, 1)] float _cloudTypeMultiplier = 1f;
+        /// <summary> Multiplier for cloud density when determining coverage modification. </summary>
+        public float CloudTypeMultiplier { get { return _cloudTypeMultiplier; } }
+
         [Header("Shape")]
         [SerializeField] float _baseDensityTiling = 2;
         /// <summary> Tiling of the base density noise relative to the <see cref="CloudScale"/>. </summary>
         public float BaseDensityTiling { get { return _baseDensityTiling; } }
+
+        [SerializeField] Texture2D _densityErosionTexture = null;
+        /// <summary> Texture whose RG channels specify density multiplier and erosion amount over cloud type (X) and height (Y). </summary>
+        public Texture2D DensityErosionTexture { get { return _densityErosionTexture; } }
 
         [Header("Density/Scattering")]
         [SerializeField] [PowerRange(0.0001f, 1f, 10f)] float _sigmaExtinction = 0.08f;
@@ -82,6 +90,7 @@ namespace VolumetricCloudsTutorial.Configuration
         {
             material.SetTexture("_BaseDensityNoise", BaseDensityPerlinWorleyNoisePacked);
             material.SetTexture("_WeatherTex", WeatherTexture);
+            material.SetTexture("_DensityErosionTex", DensityErosionTexture);
 
             material.SetFloat("_CloudScale", CloudScale);
             material.SetFloat("_WeatherScale", WeatherScale);
@@ -90,6 +99,7 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_CloudCoverageMultiplier", CloudCoverageMultiplier);
             material.SetFloat("_CloudCoverageMinimum", CloudCoverageMinimum);
             material.SetFloat("_CloudDensityCoverageMultiplier", CloudDensityCoverageMultiplier);
+            material.SetFloat("_CloudTypeMultiplier", CloudTypeMultiplier);
 
             material.SetFloat("_BaseDensityTiling", BaseDensityTiling);
 
