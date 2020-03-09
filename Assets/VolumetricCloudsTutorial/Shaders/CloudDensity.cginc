@@ -92,9 +92,7 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 
 	animatedPos = ApplyWind(posBeforeAnimation, heightFraction);
 
-	//Get weather data.
-	//TODO get weather data: coverage, wetness, cloud type, density and erosion
-
+	//Get weather data: cloud coverage, wetness, and type.
 	float4 weatherUV = float4(0.5 + posBeforeAnimation.xz / _WeatherScale, 0, 0);
 	float3 cloudCoverageWetnessType = tex2Dlod(_WeatherTex, weatherUV);
 	float coverage = cloudCoverageWetnessType.r;
@@ -105,15 +103,12 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	float cloudType = saturate(cloudCoverageWetnessType.b * _CloudTypeMultiplier);
 
 	float2 densityErosion = tex2Dlod(_DensityErosionTex, float4(cloudType, heightFraction, 0.0, 0.0)).rg;
+	erosion = densityErosion.y;
 
 	float3 baseUv = animatedPos / _CloudScale * _BaseDensityTiling;
 	float4 baseNoiseValue = tex3Dlod(_BaseDensityNoise, float4(baseUv, 0));
 	float density = UnpackPerlinWorleyBaseNoise(baseNoiseValue, _CloudDensityOffset);
 	density *= densityErosion.x;
-
-	//TODO apply weather coverage, wetness, and erosion
-	erosion = 0;
-
 	density = DensityWithCoverage(density, coverage);
 
 	density *= 0.1;//TODO until rest of density & lighting calculations are performed, use a lower base density so clouds are not effectively opaque
