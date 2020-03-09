@@ -20,6 +20,8 @@ MonoBehaviour:
   _sigmaExtinction: 0.08
   _sigmaScattering: 0.08
   _cloudDensityOffset: 0.3
-  _baseDensityPerlinWorleyNoisePacked: {fileID: 11700000, guid: 57c8727fd1968a1449b1d717d4e183b7,
+  _baseDensityNoisePacked: {fileID: 11700000, guid: 57c8727fd1968a1449b1d717d4e183b7,
+    type: 2}
+  _detailDensityNoisePacked: {fileID: 11700000, guid: da82afbb899272a40bd877a4e6c0a279,
     type: 2}
   _ambientColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}

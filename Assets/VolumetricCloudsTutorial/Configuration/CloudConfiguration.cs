@@ -63,6 +63,15 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> Texture whose RG channels specify density multiplier and erosion amount over cloud type (X) and height (Y). </summary>
         public Texture2D DensityErosionTexture { get { return _densityErosionTexture; } }
 
+        [SerializeField] float _detailTiling = 40f;
+        /// <summary> Tiling of the detail density noise relative to the <see cref="CloudScale"/>. </summary>
+        public float DetailTiling { get { return _detailTiling; } }
+
+        [SerializeField] [Range(0, 1)] float _detailStrength = 0.2f;
+        /// <summary> Strength of remapping of base density from detail density </summary>
+        public float DetailStrength { get { return _detailStrength; } }
+
+
         [Header("Density/Scattering")]
         [SerializeField] [PowerRange(0.0001f, 1f, 10f)] float _sigmaExtinction = 0.08f;
         /// <summary> The extinction coefficient used during raymarching. </summary>
@@ -76,10 +85,18 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> A uniform offset for the base cloud density. </summary>
         public float CloudDensityOffset { get { return _cloudDensityOffset; } }
 
+        [SerializeField] [PowerRange(0.01f, 2, 10)] float _finalDensityScale = 1f;
+        /// <summary> A uniform scaling for the final cloud density. </summary>
+        public float FinalDensityScale { get { return _finalDensityScale; } }
+
         [Header("Noise")]
-        [SerializeField] Texture3D _baseDensityPerlinWorleyNoisePacked = null;
+        [SerializeField] Texture3D _baseDensityNoisePacked = null;
         /// <summary> The packed noise texture used for the base cloud density. </summary>
-        public Texture3D BaseDensityPerlinWorleyNoisePacked { get { return _baseDensityPerlinWorleyNoisePacked; } }
+        public Texture3D BaseDensityNoisePacked { get { return _baseDensityNoisePacked; } }
+
+        [SerializeField] Texture3D _detailDensityNoisePacked = null;
+        /// <summary> The packed noise texture used for the detail cloud density. </summary>
+        public Texture3D DetailDensityNoisePacked { get { return _detailDensityNoisePacked; } }
 
         [Header("Lighting")]
         [SerializeField] Color _ambientColor = new Color(.8f, .8f, .8f);
@@ -88,7 +105,8 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> Sets cloud shader properties for the given material based on the configuration values. </summary>
         public void SetMaterialProperties(Material material)
         {
-            material.SetTexture("_BaseDensityNoise", BaseDensityPerlinWorleyNoisePacked);
+            material.SetTexture("_BaseDensityNoise", BaseDensityNoisePacked);
+            material.SetTexture("_DetailDensityNoise", DetailDensityNoisePacked);
             material.SetTexture("_WeatherTex", WeatherTexture);
             material.SetTexture("_DensityErosionTex", DensityErosionTexture);
 
@@ -102,10 +120,13 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_CloudTypeMultiplier", CloudTypeMultiplier);
 
             material.SetFloat("_BaseDensityTiling", BaseDensityTiling);
+            material.SetFloat("_DetailTiling", DetailTiling);
+            material.SetFloat("_DetailStrength", DetailStrength);
 
             material.SetFloat("_SigmaExtinction", SigmaExtinction);
             material.SetFloat("_SigmaScattering", SigmaScattering);
             material.SetFloat("_CloudDensityOffset", CloudDensityOffset);
+            material.SetFloat("_FinalDensityScale", FinalDensityScale);
 
             material.SetColor("_AmbientColor", AmbientColor);
         }
