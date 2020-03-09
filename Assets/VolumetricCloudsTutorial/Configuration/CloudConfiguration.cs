@@ -30,7 +30,7 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> Strength multiplier for the wind. </summary>
         public float WindStrength { get { return _windStrength; } }
 
-        [SerializeField] [Range(0, 1)] float _windHeightSkewFactor = 0.8f;
+        [SerializeField] [Range(0, 1)] float _windHeightSkewFactor = 0.2f;
         /// <summary> Factor for how clouds are skewed in the wind direction, depending on height. </summary>
         public float WindHeightSkewFactor { get { return _windHeightSkewFactor; } }
 
