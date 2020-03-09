@@ -99,7 +99,14 @@ determining the detail density.
 
 ### Detail Density
 
-TODO
+We will use the [`Remap`](#remap) operation exactly as discussed in the example,
+to combine the base density with a higher-frequency detail density:
+`RemapClamped(baseDensity, detailAmount, 1, 0, 1)`.
+
+The detail density itself consists of 3D fractal Worley noise; see the
+[NoiseTextures](NoiseTextures/NoiseTextures.md) page for details.
+We'll multiply by parametrized detail strength factor to keep the remapping from
+significantly decreasing the overall density too much.
 
 ### Curl Offset
 

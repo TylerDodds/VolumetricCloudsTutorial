@@ -4,11 +4,15 @@
 #include "NoiseTextureUtil.cginc"
 
 uniform sampler3D _BaseDensityNoise;
+uniform sampler3D _DetailDensityNoise;
 
 uniform float _CloudScale = 1;
 uniform float _WeatherScale = 1;
 uniform float _BaseDensityTiling = 1;
-uniform float _CloudDensityOffset = 0;
+uniform float _DetailTiling = 1;
+uniform float _DetailStrength = 1;
+uniform float  _CloudDensityOffset = 0;
+uniform float _FinalDensityScale = 1;
 uniform float4 _WindStrengthAndSkew = float4(0, 0, 0, 0);
 uniform float _AnvilBias = 0;
 uniform float _CloudDensityCoverageMultiplier = 1;
@@ -111,15 +115,26 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	density *= densityErosion.x;
 	density = DensityWithCoverage(density, coverage);
 
-	density *= 0.1;//TODO until rest of density & lighting calculations are performed, use a lower base density so clouds are not effectively opaque
-
 	return density;
 }
 
 float GetDetailDensity(float3 posBase, float3 animatedPos, float heightFraction, int lod, float baseDensity, float erosion)
 {
-	//TODO get detail density
-	return baseDensity;
+	float3 posWithCurl = posBase;//TODO curl noise
+	
+	float3 detailSample = tex3Dlod(_DetailDensityNoise, float4(posWithCurl / _CloudScale * _DetailTiling, lod)).rgb;
+	float detailFactor = UnpackOctaves(detailSample.rgb);
+	//TODO apply erosion
+	float detailAmount = min(0.8, detailFactor * _DetailStrength);//TODO 0.8? why?
+
+	float density = RemapClamped(baseDensity, detailAmount, 1, 0, 1);
+
+	return density;
+}
+
+float GetFinalDensity(float detailDensity)
+{
+	return detailDensity * _FinalDensityScale;
 }
 
 #endif // VCT_CLOUD_DENSITY_INCLUDED
