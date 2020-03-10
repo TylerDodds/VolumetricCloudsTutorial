@@ -106,7 +106,10 @@ to combine the base density with a higher-frequency detail density:
 The detail density itself consists of 3D fractal Worley noise; see the
 [NoiseTextures](NoiseTextures/NoiseTextures.md) page for details.
 We'll multiply by parametrized detail strength factor to keep the remapping from
-significantly decreasing the overall density too much.
+significantly decreasing the overall density too much:
+` detailAmount = min(maxDetailRemapping, detailFactor * detailStrength)`.
+We also include the maximum value `maxDetailRemapping` (of around 0.8) to
+keep a band of base density that will never be fully remapped to zero.
 
 ### Curl Offset
 
@@ -223,15 +226,20 @@ anvil shape.
 
 ### Height Density
 
-The density fraction will simply multiply the [base density][#base-density]
+The density fraction will simply multiply the [base density](#base-density)
 we unpack from the noise textures.
 
 ### Height Erosion
 
 The erosion value is applied to the effect of the detail noise textures upon
-the base density (with coverage applied).
-
-TODO
+the base density (with coverage applied). After we unpack the
+[detail noise value](#detail-density), which lies in the range [0,1], we mirror
+it depending on the erosion factor:
+`lerp(1 - worleyDetail, worleyDetail, erosion)`. When we perform this mirroring
+(low `erosion` values), the result tends to be wispier, which better lines up
+with the shape of the bottom of the clouds. This guideline comes from discussion
+of the
+[Nubis system](https://www.guerrilla-games.com/read/nubis-authoring-real-time-volumetric-cloudscapes-with-the-decima-engine).
 
 ### Density-Erosion Lookup Texture
 

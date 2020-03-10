@@ -24,4 +24,7 @@ static const float3 earthCenter = float3(0, -earthRadius, 0);
 /// Effective 'far' depth to use for return depth of clouds in directions where you see no clouds
 static const float _farDepth = 1e6;//TODO parameterize this?
 
+/// Maximum value of detail density to remap to zero
+static const float _maxDetailRemapping = 0.8;
+
 #endif // VCT_CLOUD_CONSTANTS_INCLUDED

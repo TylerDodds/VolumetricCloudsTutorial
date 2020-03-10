@@ -124,8 +124,8 @@ float GetDetailDensity(float3 posBase, float3 animatedPos, float heightFraction,
 	
 	float3 detailSample = tex3Dlod(_DetailDensityNoise, float4(posWithCurl / _CloudScale * _DetailTiling, lod)).rgb;
 	float detailFactor = UnpackOctaves(detailSample.rgb);
-	//TODO apply erosion
-	float detailAmount = min(0.8, detailFactor * _DetailStrength);//TODO 0.8? why?
+	detailFactor = lerp(1 - detailFactor, detailFactor, erosion);
+	float detailAmount = min(_maxDetailRemapping, detailFactor * _DetailStrength);
 
 	float density = RemapClamped(baseDensity, detailAmount, 1, 0, 1);
 
