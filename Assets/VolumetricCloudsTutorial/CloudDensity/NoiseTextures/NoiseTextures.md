@@ -239,6 +239,10 @@ Next, we'll split each texture using the `SplitSelectedTexture` function through
 `Tools/Textures/Split Texture2D To Texture3D Cube`. This leaves us with the
 `NoiseShape.asset` and `NoiseErosion.asset` Texture3D assets.
 
+## Generating Curl Noise
+
+TODO
+
 ## Cloud Distribution Noise Textures (2D)
 
 TODO
