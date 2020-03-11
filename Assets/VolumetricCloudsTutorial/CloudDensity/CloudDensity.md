@@ -113,6 +113,25 @@ keep a band of base density that will never be fully remapped to zero.
 
 ### Curl Offset
 
+We'll apply an offset to the position where the detail density noise texture
+lookup is performed, to add an extra bit of wispiness and detail to the
+cloud edges.
+
+One popular way to perform such offset lookups is to model a
+[flow field](https://en.wikipedia.org/wiki/Vector_field#Flow_curves) describing
+the speed of flow throughout space. We'll again use a lookup texture for this,
+but only a 2D one (ignoring the height variable).
+
+Such flow fields can be represented by
+[divergence-free vector fields](https://en.wikipedia.org/wiki/Solenoidal_vector_field),
+where the change of the field coming _into_ the point is the same as the change
+coming _out_ of the point. We can achieve such a field by taking the
+[curl](https://en.wikipedia.org/wiki/Curl_(mathematics)) of another vector field.
+Such _curl noise_ is used in games to map all kinds of fluid flow.
+See the [NoiseTextures](NoiseTextures/NoiseTextures.md) page for details.
+
+
+
 TODO
 
 ## Weather
