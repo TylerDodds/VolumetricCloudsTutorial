@@ -239,9 +239,47 @@ Next, we'll split each texture using the `SplitSelectedTexture` function through
 `Tools/Textures/Split Texture2D To Texture3D Cube`. This leaves us with the
 `NoiseShape.asset` and `NoiseErosion.asset` Texture3D assets.
 
-## Generating Curl Noise
+## Generating Curl Noise (`CurlNoise.cs`)
 
-TODO
+Recall that curl is a three-dimensional operation consisting of derivatives of
+a three-dimensional vector field with components F<sub>x</sub>, F<sub>y</sub> and F<sub>z</sub>:
+(δF<sub>z</sub>/δy - δF<sub>y</sub>/δz, δF<sub>x</sub>/δz - δF<sub>z</sub>/δx,
+  δF<sub>y</sub>/δx - δF<sub>x</sub>/δy).
+
+Naturally, each component depends on the position in space. We could generate
+a fully three-dimensional curl texture from three channels of a 3D texture,
+for instance, by approximating the derivatives by calculating small differences
+in the 3D texture channels.
+
+In our case, however, we will not need a 3D curl texture, only one that
+depends on the 2D (horizontal) position. In this case, we can assume that the
+vector field itself does not depend on vertical position (z). Since we then only
+need to evaluate the original vector field at a single value, we can begin with
+an input of three channels of a 2D texture. Furthermore, since the vector field
+doesn't change with z, all z-derivatives are zero:
+(δF<sub>z</sub>/δy, -δF<sub>z</sub>/δx, δF<sub>y</sub>/δx - δF<sub>x</sub>/δy).
+
+In this way, we can generate a 2D, 3-channel curl texture from a 2D, 3-channel
+input texture. Notice, however, that if we only wish to generate a two-channel
+curl texture, we can also assume that the vector field only has a nonzero
+F<sub>z</sub> component, in which case the curl becomes
+(δF<sub>z</sub>/δy, -δF<sub>z</sub>/δx, 0), and can be generated from a single
+channel of 2D input texture.
+
+We can use a [finite difference](https://en.wikipedia.org/wiki/Finite_difference)
+approximation to calculate gradient values. For the x-direction, this looks
+as follows:
+`[Tex(x+1, y) - Tex(x-1, y)] / (2/width)`, since we're calculating the difference
+over a distance of two pixels, so `2/width` in texture u-v space.
+
+To achieve a consistent look between channels, we'll also rescale each channel
+of the final curl texture so it is within the range of [-1, 1].
+
+Finally, we need to consider the texture format. If we only have two channels, we
+can save in `TextureFormat.RGFloat`, meaning we can store [-1, 1] values
+directly in RG channel. Otherwise, for a standard `TextureFormat.RGBA32`, we'll
+need to encode the color into the [0, 1] range that each 8 bits per channel can
+support: `encoded =  0.5 * (value + 1)`, and `decoded = 2 * encoded - 1`.
 
 ## Cloud Distribution Noise Textures (2D)
 
