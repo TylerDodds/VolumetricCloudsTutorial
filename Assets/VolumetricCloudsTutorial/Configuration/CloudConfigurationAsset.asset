@@ -24,4 +24,5 @@ MonoBehaviour:
     type: 2}
   _detailDensityNoisePacked: {fileID: 11700000, guid: da82afbb899272a40bd877a4e6c0a279,
     type: 2}
+  _curlNoise: {fileID: 2800000, guid: 1d5700d91e4e1db468a062676185bb92, type: 2}
   _ambientColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}

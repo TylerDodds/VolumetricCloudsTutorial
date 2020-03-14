@@ -130,9 +130,26 @@ coming _out_ of the point. We can achieve such a field by taking the
 Such _curl noise_ is used in games to map all kinds of fluid flow.
 See the [NoiseTextures](NoiseTextures/NoiseTextures.md) page for details.
 
+We need to support a `TextureFormat` of `RGFloat` (two channels,
+floating-point precision) or `RGB24` (three channels are used, 8 bits per channel).
+In the latter case, the values will be encoded from the range [-1, 1] to [0, 1], so we'll have to
+decode the three channels.
 
+When setting the curl texture in the material, we also set the `UNPACK_CURL`
+keyword if the texture format is 8 bits per channel, instead of floating point.
+We enable this in the shader `CGPROGRAM` block with the line
+`#pragma shader_feature UNPACK_CURL`,
+and can test in the shader program with the shader preprocessor macro
+````
+#if defined(UNPACK_CURL)
+...
+#endif
+````
 
-TODO
+Then we add the curl noise value, multiplied by strength, to the world-space
+position where the detail density noise texture will be evaluated. We also
+decrease the effect of the curl with height, to make a more pronounced
+effect on the bottom of the clouds.
 
 ## Weather
 

@@ -69,7 +69,7 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         {
             int width = baseTexture.width;
             int height = baseTexture.height;
-            Texture2D curlTexture = new Texture2D(width, height, threeChannelsOut ? TextureFormat.RGBA32 : TextureFormat.RGFloat, mipmap);
+            Texture2D curlTexture = new Texture2D(width, height, threeChannelsOut ? TextureFormat.RGB24 : TextureFormat.RGFloat, mipmap);
 
             Color[] pixels = baseTexture.GetPixels(0, 0, width, height);
             int GetIndex(int x, int y) => y * width + x;

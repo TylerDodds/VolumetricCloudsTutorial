@@ -19,9 +19,16 @@ uniform float _CloudDensityCoverageMultiplier = 1;
 uniform float _CloudCoverageMultiplier = 1;
 uniform float _CloudCoverageMinimum = 0;
 uniform float _CloudTypeMultiplier = 1;
+uniform float _CurlTiling = 1;
+uniform float _CurlStrength = 1;
 
 uniform sampler2D _WeatherTex;
 uniform sampler2D _DensityErosionTex;
+#if defined(UNPACK_CURL)
+uniform sampler2D _CurlTex;
+#else
+uniform sampler2D_float _CurlTex;
+#endif
 
 /// Determines the fraction within the atmosphere's height,
 /// given a height value.
@@ -120,7 +127,13 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 
 float GetDetailDensity(float3 posBase, float3 animatedPos, float heightFraction, int lod, float baseDensity, float erosion)
 {
-	float3 posWithCurl = posBase;//TODO curl noise
+	float3 curlSamplePos = animatedPos + _WindStrengthAndSkew.xyz * _Time.y * 0.5;
+	float3 curlNoise = tex2Dlod(_CurlTex, float4(curlSamplePos.xz / _CloudScale * _CurlTiling, 0.0, 1.0)).rgb;
+#if defined(UNPACK_CURL)
+	curlNoise = 2 * curlNoise - 1;
+#endif
+	float3 posWithCurl = animatedPos;
+	posWithCurl.xyz += curlNoise * _CloudScale * (1 - heightFraction) * _CurlStrength;
 	
 	float3 detailSample = tex3Dlod(_DetailDensityNoise, float4(posWithCurl / _CloudScale * _DetailTiling, lod)).rgb;
 	float detailFactor = UnpackOctaves(detailSample.rgb);
