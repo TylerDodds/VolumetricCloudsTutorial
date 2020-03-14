@@ -71,6 +71,14 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> Strength of remapping of base density from detail density </summary>
         public float DetailStrength { get { return _detailStrength; } }
 
+        [SerializeField] [PowerRange(0.001f, 10f, 10f)] float _curlTiling = 0.01f;
+        /// <summary> Tiling of curl noise relative to the <see cref="CloudScale"/>. </summary>
+        public float CurlTiling { get { return _curlTiling; } }
+
+        [SerializeField] [Range(0, 0.1f)] float _curlStrength = 0.05f;
+        /// <summary> Strength of curl noise offset of detail density sampling. </summary>
+        public float CurlStrength { get { return _curlStrength; } }
+
 
         [Header("Density/Scattering")]
         [SerializeField] [PowerRange(0.0001f, 1f, 10f)] float _sigmaExtinction = 0.08f;
@@ -98,6 +106,10 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> The packed noise texture used for the detail cloud density. </summary>
         public Texture3D DetailDensityNoisePacked { get { return _detailDensityNoisePacked; } }
 
+        [SerializeField] Texture2D _curlNoise = null;
+        /// <summary> The curl noise used to offset the sample position for the detail cloud density. </summary>
+        public Texture2D CurlNoise { get { return _curlNoise; } }
+
         [Header("Lighting")]
         [SerializeField] Color _ambientColor = new Color(.8f, .8f, .8f);
         public Color AmbientColor { get { return _ambientColor; } }
@@ -109,6 +121,15 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetTexture("_DetailDensityNoise", DetailDensityNoisePacked);
             material.SetTexture("_WeatherTex", WeatherTexture);
             material.SetTexture("_DensityErosionTex", DensityErosionTexture);
+            material.SetTexture("_CurlTex", CurlNoise);//TODO set keyword for packing?
+            if(CurlNoise != null && (CurlNoise.format == TextureFormat.RGB24 || CurlNoise.format == TextureFormat.RGBA32))
+            {
+                material.EnableKeyword(_unpackCurlKeyword);
+            }
+            else
+            {
+                material.DisableKeyword(_unpackCurlKeyword);
+            }
 
             material.SetFloat("_CloudScale", CloudScale);
             material.SetFloat("_WeatherScale", WeatherScale);
@@ -122,6 +143,8 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_BaseDensityTiling", BaseDensityTiling);
             material.SetFloat("_DetailTiling", DetailTiling);
             material.SetFloat("_DetailStrength", DetailStrength);
+            material.SetFloat("_CurlTiling", CurlTiling);
+            material.SetFloat("_CurlStrength", CurlStrength);
 
             material.SetFloat("_SigmaExtinction", SigmaExtinction);
             material.SetFloat("_SigmaScattering", SigmaScattering);
@@ -130,5 +153,7 @@ namespace VolumetricCloudsTutorial.Configuration
 
             material.SetColor("_AmbientColor", AmbientColor);
         }
+
+        private const string _unpackCurlKeyword = "UNPACK_CURL";
     }
 }
