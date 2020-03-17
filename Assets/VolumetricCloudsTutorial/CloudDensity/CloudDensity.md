@@ -64,11 +64,6 @@ The remap function, along with a clamped version (restricting the final value
 between NewMin and NewMax) are implemented for use in our shaders in
 `MathUtil.cginc`.
 
-### Other
-
-TODO - others common operations
-
-
 ## Local Density
 
 ### Base Density
@@ -311,4 +306,28 @@ can become noticeable.
 
 ## Final Density
 
-TODO
+We review the density calculation steps below.
+
+* Base Density
+    * Read cloud coverage, wetness and type from sampling Weather texture at current position
+    * Scale and remap coverage based on global scale and minimum
+    * Apply anvil shape bias by taking coverage to a height-based power
+    * Reduce coverage to zero over large distances
+    * Sample density multiplier and erosion values from cloud type and height
+    * Get animated sample position from wind offset and height-based skew
+    * Sample base noise texture and unpack
+        * Perlin-Worley Noise in R channel, Worley fractal noise in GBA channels
+        * Remap Perlin-Worley noise with minimum from Worley-fractal to 0
+    * Multiply density by density-erosion multiplier
+    * Apply coverage to density
+        * Also reduce density by coverage to make cloud edges lighter
+* Detail Density
+    * Get curl animated sample position from additional wind offset
+    * Sample and decode curl noise values
+    * Apply curl noise value offset to base density's animated sample position
+    * Sample and unpack Worley fractal noise
+    * Interpolate between `1-detail` and `detail` based on erosion amount
+    * Apply detail strength multiplier and detail maximum
+    * Remap base density minimum range from detail amount to 0
+* Final density
+    * Multiply density by overall density scale

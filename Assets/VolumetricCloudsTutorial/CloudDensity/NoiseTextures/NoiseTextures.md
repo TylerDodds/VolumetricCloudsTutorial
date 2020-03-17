@@ -283,4 +283,12 @@ support: `encoded =  0.5 * (value + 1)`, and `decoded = 2 * encoded - 1`.
 
 ## Cloud Distribution Noise Textures (2D)
 
-TODO
+The weather texture, as well as the input to the curl texture, require
+sets of 2D noise textures. One each is required for the cloud coverage,
+wetness, and type. Three are required for the x, y, z components of the
+input vector field for curl generation.
+
+These can be generated in image editing software, such as GIMP, or created with
+specialized tools such as Substance Designer.
+Additionally, many online tools or code repositories exist to generate various
+noise textures.

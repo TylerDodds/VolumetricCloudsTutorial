@@ -145,9 +145,9 @@ float GetDetailDensity(float3 posBase, float3 animatedPos, float heightFraction,
 	return density;
 }
 
-float GetFinalDensity(float detailDensity)
+float GetFinalDensity(float baseOrDetailDensity)
 {
-	return detailDensity * _FinalDensityScale;
+	return baseOrDetailDensity * _FinalDensityScale;
 }
 
 #endif // VCT_CLOUD_DENSITY_INCLUDED
