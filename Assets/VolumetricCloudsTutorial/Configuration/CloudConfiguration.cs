@@ -111,6 +111,10 @@ namespace VolumetricCloudsTutorial.Configuration
         public Texture2D CurlNoise { get { return _curlNoise; } }
 
         [Header("Lighting")]
+        [SerializeField] [Range(0, 1)] float _eccentricityForwards = 0.8f;
+        public float EccentricityForwards { get { return _eccentricityForwards; } }
+        [SerializeField] [Range(-0.5f, 0.5f)] float _eccentricityBackwards = 0.1f;
+        public float EccentricityBackwards { get { return _eccentricityBackwards; } }
         [SerializeField] Color _ambientColor = new Color(.8f, .8f, .8f);
         public Color AmbientColor { get { return _ambientColor; } }
 
@@ -151,6 +155,8 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_CloudDensityOffset", CloudDensityOffset);
             material.SetFloat("_FinalDensityScale", FinalDensityScale);
 
+            material.SetFloat("_EccentricityForwards", EccentricityForwards);
+            material.SetFloat("_EccentricityBackwards", EccentricityBackwards);
             material.SetColor("_AmbientColor", AmbientColor);
         }
 
