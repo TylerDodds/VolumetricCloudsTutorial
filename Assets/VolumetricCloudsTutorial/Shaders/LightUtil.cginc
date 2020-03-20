@@ -2,6 +2,9 @@
 #define VCT_LIGHT_UTIL_INCLUDED
 
 #include "Lighting.cginc"
+
+static const float _four_pi = 12.5663706144;
+
 ///Direction "towards" the directional light, in world space.
 inline float3 GetWorldSpaceLightDirection()
 {
@@ -45,7 +48,7 @@ float ExponentialIntegral(float z)
 	return 0.5772156649015328606065 + log(1e-4 + abs(z)) + z * (1.0 + z * (0.25 + z * ((1.0 / 18.0) + z * ((1.0 / 96.0) + z * (1.0 / 600.0)))));
 }
 
-///Approximation to ambient intensity assuming homogeneous radiance coming separately form top and bottom of clouds
+///Approximation to ambient intensity assuming homogeneous radiance coming separately form top and bottom of clouds.
 ///See Real-Time Volumetric Rendering course notes By Patapom / Bomb! 
 float2 GetAmbientIntensityTopBottom(float heightFraction, float sigmaExtinction)
 {
@@ -60,7 +63,5 @@ float2 GetAmbientIntensityTopBottom(float heightFraction, float sigmaExtinction)
 
 	return float2(isotropicScatteringTop, isotropicScatteringBottom);
 }
-
-static const float _four_pi = 12.5663706144;
 
 #endif // VCT_LIGHT_UTIL_INCLUDED
