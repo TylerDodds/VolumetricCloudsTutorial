@@ -8,7 +8,12 @@ through the current raymarch point, and towards the direction of the camera.
 Focusing on the single-scattering case, this involves determining the
 _self-shadowing_ (transmission of light directly from the sun through the
 clouds to the raymarch point), as well as the scattering _phase function_
-that gives the probability of the light being scattered in a given direction
+that gives the probability of the light being scattered in a given direction.
+
+This means that the fraction of the light intensity being scattered is given by
+`transmittance * phase`, where `transmittance` is the transmittance from the
+sun to the current point, and `phase` is the phase function evaluating the
+fraction of scattering from that point in the direction of the camera.
 
 In addition, we will also discuss techniques to approximate visual results of
 multiple scattering events using our single-scattering machinery.
@@ -60,11 +65,42 @@ Our [multi-scattering approximation](#multi-scattering-approximation) will also
 alter the single scattering approximation in a non-normalized manner. In both
 cases, we rely not on physical correctness, but on achieving the desired look.
 
-## Multi-Scattering Approximation
+## Self-Shadowing
 
 TODO
 
-## Self-Shadowing
+## Multi-Scattering Approximation
+
+One simple approximation that can be used to achieved some of the look of
+multiple scattering is [discussed by Wrennige](http://magnuswrenninge.com/publications/attachment/wrenninge-ozthegreatandvolumetric),
+and is suitable for use in our real-time system.
+
+The idea is to sum over multiple 'octaves' of the base
+transmittance-and-phase contribution. In each octave _i_ in `0 ... n-1`,
+the extinction is lowered by some amount _a_<sup>_i_</sup>, to increase the
+amount of light from the sun reaching the raymarch point. The eccentricity
+used in the phase factor is also lowered by _b_<sup>_i_</sup>, and the
+total light contribution is reduced by _c_<sup>_i_</sup>.
+Three octaves (`i = 0, 1, 2`), and values of 0.5 each for _a_, _b_ and _c_ are
+good starting points.
+
+Then the light intensity fraction is approximated as:
+&Sum;<sub>i</sub> _c_<sup>_i_</sup> p(&theta;, _g_ _b_<sup>_i_</sup>)
+exp(- _a_<sup>_i_</sup> &int;<sub>0</sub><sup>D</sup>&sigma;(z)dz),
+where _g_ is the eccentricity, p is the phase function, and the integral runs
+along the direction from raymarch point to the sun, covering the distance needed
+until it has exited the clouds.
+
+Note that we can rewrite
+exp(- _a_<sup>_i_</sup> &int;<sub>0</sub><sup>D</sup>&sigma;(z)dz)
+as exp(-&int;<sub>0</sub><sup>D</sup>&sigma;(z)dz)<sup>_a_<sup>_i_</sup></sup>
+due to the exponent power rule. Then if exp(-&int;<sub>0</sub><sup>D</sup>&sigma;(z)dz)
+= T<sub>S</sub> is the base transmittance between sun and raymarch point, we have
+the final contribution:
+&Sum;<sub>i</sub> _c_<sup>_i_</sup>
+p(&theta;, _g_ _b_<sup>_i_</sup>)T<sub>S</sub><sup>_a_<sup>_i_</sup></sup>.
+
+## Other Scattering Multipliers
 
 TODO
 

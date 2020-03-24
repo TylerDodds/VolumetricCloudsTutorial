@@ -113,10 +113,23 @@ namespace VolumetricCloudsTutorial.Configuration
         [Header("Lighting")]
         [SerializeField] [Range(0, 1)] float _eccentricityForwards = 0.8f;
         public float EccentricityForwards { get { return _eccentricityForwards; } }
+
         [SerializeField] [Range(-0.5f, 0.5f)] float _eccentricityBackwards = 0.1f;
         public float EccentricityBackwards { get { return _eccentricityBackwards; } }
+
+        [SerializeField] [Range(0, 1)] float _multiScatteringExtinctionFactor = 0.5f;
+        public float MultiScatteringExtinctionFactor { get { return _multiScatteringExtinctionFactor; } }
+
+        [SerializeField] [Range(0, 1)] float _multiScatteringEccentricityFactor = 0.5f;
+        public float MultiScatteringEccentricityFactor { get { return _multiScatteringEccentricityFactor; } }
+
+        [SerializeField] [Range(0, 1)] float _multiScatteringIntensityFactor = 0.5f;
+        public float MultiScatteringIntensityFactor { get { return _multiScatteringIntensityFactor; } }
+
         [SerializeField] Color _ambientColor = new Color(.8f, .8f, .8f);
         public Color AmbientColor { get { return _ambientColor; } }
+
+        
 
         /// <summary> Sets cloud shader properties for the given material based on the configuration values. </summary>
         public void SetMaterialProperties(Material material)
@@ -157,6 +170,7 @@ namespace VolumetricCloudsTutorial.Configuration
 
             material.SetFloat("_EccentricityForwards", EccentricityForwards);
             material.SetFloat("_EccentricityBackwards", EccentricityBackwards);
+            material.SetVector("_MultiScatteringFactors_Extinction_Eccentricity_Intensity", new Vector4(MultiScatteringExtinctionFactor, MultiScatteringEccentricityFactor, MultiScatteringIntensityFactor, 0));
             material.SetColor("_AmbientColor", AmbientColor);
         }
 
