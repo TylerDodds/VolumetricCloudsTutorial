@@ -111,6 +111,9 @@ namespace VolumetricCloudsTutorial.Configuration
         public Texture2D CurlNoise { get { return _curlNoise; } }
 
         [Header("Lighting")]
+        [SerializeField] [PowerRange(2, 2048, 2)] float _shadowStepBase = 32f;
+        public float ShadowStepBase { get { return _shadowStepBase; } }
+
         [SerializeField] [Range(0, 1)] float _eccentricityForwards = 0.8f;
         public float EccentricityForwards { get { return _eccentricityForwards; } }
 
@@ -163,6 +166,7 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_CurlTiling", CurlTiling);
             material.SetFloat("_CurlStrength", CurlStrength);
 
+            material.SetFloat("_ShadowStepBase", ShadowStepBase);
             material.SetFloat("_SigmaExtinction", SigmaExtinction);
             material.SetFloat("_SigmaScattering", SigmaScattering);
             material.SetFloat("_CloudDensityOffset", CloudDensityOffset);
