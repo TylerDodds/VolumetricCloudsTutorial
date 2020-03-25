@@ -100,6 +100,10 @@ the final contribution:
 &Sum;<sub>i</sub> _c_<sup>_i_</sup>
 p(&theta;, _g_ _b_<sup>_i_</sup>)T<sub>S</sub><sup>_a_<sup>_i_</sup></sup>.
 
+We will use a loop with the `[unroll]` attribute to perform all octave
+calculations without branching. Using this, we may also easily alter the
+number of octaves.
+
 ## Other Scattering Multipliers
 
 TODO
