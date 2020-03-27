@@ -67,7 +67,38 @@ cases, we rely not on physical correctness, but on achieving the desired look.
 
 ## Self-Shadowing
 
-TODO
+We need to determine the fraction of light that reaches the current raymarch
+point from the sun. This is precisely the Transmittance we discussed in
+[Raymarching](Raymarching.md), although calculated from the raymarch point
+in the direction of the sun.
+
+However, we cannot afford to do an entirely new raymarch loop for each
+point in our original raymarching! We will instead approximate the transmittance
+exp(-&int;<sub>0</sub><sup>D</sup>&sigma;(z)dz) =
+exp(-&sigma;<sub>S</sub>&int;<sub>0</sub><sup>D</sup>&rho;(z)dz)
+by approximating the _optical distance_ &int;<sub>0</sub><sup>D</sup>&rho;(z)dz.
+
+Like any other integral approximation, we'll sample the density, &rho;$, at
+various positions, and weight each according to the step size. Keeping in mind
+the performance constraint we just discussed, we'll keep the number of samples
+very low, around 5. We'll only
+
+Thanks to the exponential function in the transmittance, when the optical
+distance is small, small changes will have a bigger effect on decreasing the
+transmittance.
+As a result, we'll increase the step size the further away we get from the
+raymarch point. This way, we increase accuracy of our sampling for points close
+to the edge of the cloud. We'll also increase the mipmap level used for
+accessing the density noise texture along with the step size. This has two
+benefits. One, the higher mipmap level will average out the noise texture,
+meaning our sample will better represent the integral over its step size. Two,
+this average happens in 3D texture space, so we are better able to incorporate
+density information from further out in a cone-like manner. This way, we can
+roughly approximate incorporating incoming light not only directly from the sun,
+but from other angles through multiple scattering.
+
+At each concurrent step, we will take a step of 1, 1, 2, 4, and 8 times the
+base step size for the shadowing optical distance calculation.
 
 ## Multi-Scattering Approximation
 
