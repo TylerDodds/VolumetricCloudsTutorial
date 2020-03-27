@@ -67,6 +67,8 @@ cases, we rely not on physical correctness, but on achieving the desired look.
 
 ## Self-Shadowing
 
+### Transmittance from Sun
+
 We need to determine the fraction of light that reaches the current raymarch
 point from the sun. This is precisely the Transmittance we discussed in
 [Raymarching](Raymarching.md), although calculated from the raymarch point
@@ -76,7 +78,7 @@ However, we cannot afford to do an entirely new raymarch loop for each
 point in our original raymarching! We will instead approximate the transmittance
 exp(-&int;<sub>0</sub><sup>D</sup>&sigma;(z)dz) =
 exp(-&sigma;<sub>S</sub>&int;<sub>0</sub><sup>D</sup>&rho;(z)dz)
-by approximating the _optical distance_ &int;<sub>0</sub><sup>D</sup>&rho;(z)dz.
+by approximating the density integral &int;<sub>0</sub><sup>D</sup>&rho;(z)dz.
 
 Like any other integral approximation, we'll sample the density, &rho;$, at
 various positions, and weight each according to the step size. Keeping in mind
@@ -100,6 +102,27 @@ but from other angles through multiple scattering.
 At each concurrent step, we will take a step of 1, 1, 2, 4, and 8 times the
 base step size for the shadowing optical distance calculation.
 
+### Transmittance Lightening
+
+Since the transmittance from the sun only models a light coming directly from
+the sun, and ignores multiple-scattering paths, values will be smaller than expected.
+
+The base transmittance T<sub>B</sub> = exp(-&int;<sub>0</sub><sup>D</sup>&sigma;(z)dz)
+= exp(-OD), where OD is known as the _optical depth_.
+One way is to significantly reduce the optical depth, while also reducing the
+overall transmittance:
+T<sub>L</sub> = &alpha; exp(-&beta; OD), where &alpha;, &beta; &in; (0, 1].
+We take &alpha; = 0.7, &beta; = 0.25.
+
+Additionally, we reduce the lightened transmittance when the raymarch and sun
+directions are close, and we expect strong forward scattering from the phase
+function.
+It is reduced by a factor `Remap(cosTheta, 0.7, 1.0, 1.0, 0.25)`, clamped to [0,1].
+
+Finally, we take the maximum of the lightened and base transmissions, since the
+goal is to prevent our single-scattering approximation from giving transmittance
+values that look too dark.
+
 ## Multi-Scattering Approximation
 
 One simple approximation that can be used to achieved some of the look of
@@ -122,7 +145,7 @@ where _g_ is the eccentricity, p is the phase function, and the integral runs
 along the direction from raymarch point to the sun, covering the distance needed
 until it has exited the clouds.
 
-Note that we can rewrite
+We can rewrite
 exp(- _a_<sup>_i_</sup> &int;<sub>0</sub><sup>D</sup>&sigma;(z)dz)
 as exp(-&int;<sub>0</sub><sup>D</sup>&sigma;(z)dz)<sup>_a_<sup>_i_</sup></sup>
 due to the exponent power rule. Then if exp(-&int;<sub>0</sub><sup>D</sup>&sigma;(z)dz)

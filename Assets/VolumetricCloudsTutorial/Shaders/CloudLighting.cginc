@@ -50,6 +50,14 @@ float GetLightCloudOpticalDistance(float3 worldPos)
 	return opticalDistance;
 }
 
+float LightenTransmittance(float transmittance, float cosTheta)
+{
+	float lightenedTransmittance = pow(transmittance, 0.25) * 0.7;
+	//Do less lightening in directions where forward scattering will be very strong (theta close to zero)
+	float lightenedFrac = saturate(Remap(cosTheta, 0.7, 1.0, 1.0, 0.25));
+	return max(transmittance, lightenedTransmittance * lightenedFrac);
+}
+
 /// At a given point in the cloud and view direction from the camera, determine the 
 /// intensity of scattered light from the sun through this point to the camera.
 float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float baseDensity, float stepSize)
@@ -58,9 +66,7 @@ float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float base
 
 	const float lightDirectionOpticalDistance = GetLightCloudOpticalDistance(worldPos);
 	const float lightTransmittance = exp(-_SigmaExtinction * lightDirectionOpticalDistance);
-	//TODO transmittance lightening
-	const float baseTransmittance = lightTransmittance;
-
+	const float baseTransmittance = LightenTransmittance(lightTransmittance, cosTheta);
 
 	float result = 0.0f;
 	[unroll]
