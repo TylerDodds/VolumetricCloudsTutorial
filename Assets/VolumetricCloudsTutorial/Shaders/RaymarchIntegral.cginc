@@ -44,7 +44,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart,
 				const float clampedExtinction = max(extinction, 0.0000001);
 				const float transmittance = exp(-extinction * stepSizeBase);
 
-				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, baseDensityCurrent, stepSizeBase) * lerp(1.0, _wetIntensityFraction, wetness);
+				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, baseDensityCurrent, stepSizeBase) * lerp(1.0, _wetIntensityFraction, wetness);
 
 				float integratedIntensity = (scatteredIntensity - scatteredIntensity * transmittance) / clampedExtinction;
 				float integratedIntensityAmbient = (scattering - scattering * transmittance) / clampedExtinction;//Multi-scattering approximation only on the sun-light term, not ambient term
