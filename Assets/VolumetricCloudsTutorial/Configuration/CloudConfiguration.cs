@@ -129,6 +129,18 @@ namespace VolumetricCloudsTutorial.Configuration
         [SerializeField] [Range(0, 1)] float _multiScatteringIntensityFactor = 0.5f;
         public float MultiScatteringIntensityFactor { get { return _multiScatteringIntensityFactor; } }
 
+        [SerializeField] [Range(0, 1)] float _heightScatteringLowFraction = 0.07f;
+        public float HeightScatteringLowFraction { get { return _heightScatteringLowFraction; } }
+
+        [SerializeField] [Range(0, 1)] float _heightScatteringHighFraction = 0.14f;
+        public float HeightScatteringHighFraction { get { return _heightScatteringHighFraction; } }
+
+        [SerializeField] [Range(0, 1)] float _heightScatteringMinProbability = 0.2f;
+        public float HeightScatteringMinProbability { get { return _heightScatteringMinProbability; } }
+
+        [SerializeField] [Range(0, 3)] float _heightScatteringPower = 0.7f;
+        public float HeightScatteringPower { get { return _heightScatteringPower; } }
+
         [SerializeField] Color _ambientColor = new Color(.8f, .8f, .8f);
         public Color AmbientColor { get { return _ambientColor; } }
 
@@ -175,6 +187,7 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetFloat("_EccentricityForwards", EccentricityForwards);
             material.SetFloat("_EccentricityBackwards", EccentricityBackwards);
             material.SetVector("_MultiScatteringFactors_Extinction_Eccentricity_Intensity", new Vector4(MultiScatteringExtinctionFactor, MultiScatteringEccentricityFactor, MultiScatteringIntensityFactor, 0));
+            material.SetVector("_HeightScattering_Low_High_Min_Power", new Vector4(HeightScatteringLowFraction, HeightScatteringHighFraction, HeightScatteringMinProbability, HeightScatteringPower));
             material.SetColor("_AmbientColor", AmbientColor);
         }
 

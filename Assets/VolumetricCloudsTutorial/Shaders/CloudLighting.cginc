@@ -9,6 +9,7 @@ uniform float _EccentricityForwards;
 uniform float _EccentricityBackwards;
 uniform float4 _MultiScatteringFactors_Extinction_Eccentricity_Intensity;
 uniform float _ShadowStepBase;
+uniform float4 _HeightScattering_Low_High_Min_Power;
 
 float CloudPhase(float cosTheta, float eccentricityMultiplier)
 {
@@ -60,7 +61,7 @@ float LightenTransmittance(float transmittance, float cosTheta)
 
 /// At a given point in the cloud and view direction from the camera, determine the 
 /// intensity of scattered light from the sun through this point to the camera.
-float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float baseDensity, float stepSize)
+float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float heightFraction, float baseDensity, float stepSize)
 {
 	const float cosTheta = dot(viewDir, GetWorldSpaceLightDirection());
 
@@ -78,8 +79,9 @@ float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float base
 		result += phase * transmittance * pow(_MultiScatteringFactors_Extinction_Eccentricity_Intensity.z, octaveIndex);
 	}
 
-	//TODO Height scattering probability
 	//TODO Depth scattering probability
+	float verticalScatteringRate = pow(RemapClamped(heightFraction, _HeightScattering_Low_High_Min_Power.x, _HeightScattering_Low_High_Min_Power.y, _HeightScattering_Low_High_Min_Power.z, 1.0), _HeightScattering_Low_High_Min_Power.w);
+	result *= verticalScatteringRate;
 
 	return result;
 }
