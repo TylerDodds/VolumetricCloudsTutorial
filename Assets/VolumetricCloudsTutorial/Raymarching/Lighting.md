@@ -65,7 +65,7 @@ Our [multi-scattering approximation](#multi-scattering-approximation) will also
 alter the single scattering approximation in a non-normalized manner. In both
 cases, we rely not on physical correctness, but on achieving the desired look.
 
-## Self-Shadowing
+## Self Shadowing
 
 ### Transmittance from Sun
 
@@ -160,7 +160,39 @@ number of octaves.
 
 ## Other Scattering Multipliers
 
-TODO
+Although we've used an approximation to simulate some of the extra intensity
+from other in-scattering events, we've done so in an entirely local manner.
+We can consider other _scattering probabilities_ based on where the raymarch
+point is in the cloud.
+
+First, we consider a height-based probability. Since there is no cloud material
+underneath the clouds, there will be less chance for light to in-scatter at the
+very bottom of the cloud layer. We transition from a minimum height-scattering
+probability to 1 between a height range at the bottom of the clouds:
+`pow(RemapClamped(HeightFraction, LowHeight, HighHeight, MinProbability, 1.0), Power)`.
+
+Second, we consider a depth-based probability. Using a similar logic, we expect
+points at the edges of clouds to have less surrounding material that can help
+contribute to scattering. We can consider various methods to determine the
+amount of density in the neighbourhood of a given point, which we can take as a
+multiplier for the scattering probability. Taking the base density is a start,
+and should not vary too quickly with raymarch position; as discussed in
+[self-shadowing](#self-shadowing), we could even consider doing so at a higher
+MIP level. By taking this to a height-dependent power (lower power at lower height),
+we have a basic approximation for depth scattering.
+
+Note that we could also use _transmittance_ as an approximation to this type
+of depth scattering: the lower the transmittance, the further inside the cloud you
+are. We will use the sun-to-raymarch point density integral as an additional factor;
+when this is large, you are likely to be at a point significantly inside the
+cloud (compared to the sun), so we expect the depth scattering probability to be
+its maximum value of 1.
+
+For more information, see the presentations on the
+[Nubis system](https://www.guerrilla-games.com/read/nubis-authoring-real-time-volumetric-cloudscapes-with-the-decima-engine).
+Note that the depth scattering approximation used to be described a 'Beer-powder law',
+and used instead the transmittance towards the camera as an estimate for the
+depth scattering probability.
 
 ## Ambient Lighting
 
