@@ -10,6 +10,7 @@ uniform float _EccentricityBackwards;
 uniform float4 _MultiScatteringFactors_Extinction_Eccentricity_Intensity;
 uniform float _ShadowStepBase;
 uniform float4 _HeightScattering_Low_High_Min_Power;
+uniform float4 _DepthScattering_Low_High_Min_Max;
 
 float CloudPhase(float cosTheta, float eccentricityMultiplier)
 {
@@ -81,7 +82,9 @@ float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float heig
 
 	//TODO Depth scattering probability
 	float verticalScatteringRate = pow(RemapClamped(heightFraction, _HeightScattering_Low_High_Min_Power.x, _HeightScattering_Low_High_Min_Power.y, _HeightScattering_Low_High_Min_Power.z, 1.0), _HeightScattering_Low_High_Min_Power.w);
-	result *= verticalScatteringRate;
+	float depthScatteringBase = pow(saturate(baseDensity), RemapClamped(heightFraction, _DepthScattering_Low_High_Min_Max.x, _DepthScattering_Low_High_Min_Max.y, _DepthScattering_Low_High_Min_Max.z, _DepthScattering_Low_High_Min_Max.w));
+	float depthScatteringRate = lerp(0.05 + depthScatteringBase, 1.0, saturate(lightDirectionOpticalDistance / stepSize));
+	result *= verticalScatteringRate * depthScatteringRate;
 
 	return result;
 }
