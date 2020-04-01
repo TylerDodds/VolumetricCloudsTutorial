@@ -12,14 +12,13 @@ fixed4 RaymarchColorLitAnalyticalTransmittanceIntensity(float4 transmittanceAndI
 	float4 result = float4(0, 0, 0, saturate(1 - transmittanceAndIntensitiesAndDepth.r));
 
 	fixed3 sunColor = _LightColor0;
+#if UNITY_COLORSPACE_GAMMA
+	sunColor.rgb = GammaToLinearSpace(sunColor.rgb);
+#endif
 	result.rgb += transmittanceAndIntensitiesAndDepth.g * sunColor;
 
 	result.rgb += transmittanceAndIntensitiesAndDepth.b * ambient;
 
-#if UNITY_COLORSPACE_GAMMA
-	result.rgb = LinearToGammaSpace(result.rgb);
-	result.a = LinearToGammaSpaceExact(result.a);
-#endif
 	return result;
 }
 
