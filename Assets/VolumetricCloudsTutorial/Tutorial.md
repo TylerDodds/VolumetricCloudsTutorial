@@ -73,6 +73,11 @@ TODO
 
 ## Project Set-Up
 
+### Color Space
+
+As discussed in [Lighting](Raymarching/Lighting.md), we should use a Linear
+color space, instead of a Gamma one.
+
 ### Image Effects
 
 We set up our Clouds rendering as a Unity Image Effect Component on the Camera

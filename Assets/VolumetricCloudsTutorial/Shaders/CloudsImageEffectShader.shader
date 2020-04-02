@@ -20,6 +20,10 @@
 	half4 frag(v2f i) : SV_Target
 	{
 		half4 sceneColor = tex2D(_MainTex, i.uv);
+		#if UNITY_COLORSPACE_GAMMA
+		sceneColor.rgb = GammaToLinearSpace(sceneColor.rgb);
+		sceneColor.a = GammaToLinearSpaceExact(sceneColor.a);
+		#endif
 
 		float3 worldSpaceDirection;
 		const float offset = 0;
@@ -32,7 +36,12 @@
 		raymarchColor *= (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceDirection.y));//Multiply by fade-out factor for far-away clouds, acting like 'fade to skybox' (really should fade to atmospheric scattering value).
 		//TODO A whole atmospheric scattering solution is needed if we don't wish to perform this simple approximation.
 
-		return raymarchColor + sceneColor * (1 - raymarchColor.a);//premultiplied alpha
+		float4 finalColor = raymarchColor + sceneColor * (1 - raymarchColor.a);//premultiplied alpha
+		#if UNITY_COLORSPACE_GAMMA
+		finalColor.rgb = LinearToGammaSpace(finalColor.rgb);
+		finalColor.a = LinearToGammaSpaceExact(finalColor.a);
+		#endif
+		return finalColor;
 		//TODO handle clouds in front of transparent objects? do clouds first then skybox 'underneath' with its own separate blending?
 	}
 

@@ -201,3 +201,28 @@ TODO
 ## Final Lighting
 
 TODO
+
+## Color Space
+
+All of our discussions on light transmittance and scattering implicitly assumes
+that our colors are physical quantities of light. Therefore, we must use a
+__Linear__ color space space, instead of a __Gamma__ one (see
+[this discussion](https://docs.unity3d.com/Manual/LinearRendering-LinearOrGammaWorkflow.html)
+for details).
+There are likely no cases where a platform can support a full volumetric clouds
+rendering solution, but not a full Linear color space.
+
+Nonetheless, we can take some steps to ensure that we obtain consistent results
+even if the project happens to be in Gamma space. Since our raymarching implicitly
+happens using linear (physical) lighting, we simply convert all appropriate
+quantities to that format for the raymarching and blending, and convert back
+to Gamma space afterwards:
+
+* Ensure that the sun color is converted from Gamma to Linear space.
+* Ensure that the scene color is converted from Gamma to Linear space
+before blending.
+* Ensure that the final color is converted from Linear to Gamma space
+after blending.
+
+Using the `GammaToLinearSpace` and similar functions in `UnityCG.cginc`
+can help us in the conversion.
