@@ -51,7 +51,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart,
 				//TODO Determine correct extinction-to-camera value. Wrennige's brief paper seems to indicate it's only the shadow extinction term, not the to-camera term, so we're just 'lightening' the light reaching the sample point, not affecting our blending operator.
 
 				float extinctionToCamera = transmittanceIntensitiesDepthAccumulator.r;
-				// TODO Adjustments from 'Beer-Powder' approximation
+				// TODO Adjustments for ambient intensity from scattering?
 
 				transmittanceIntensitiesDepthAccumulator.g += integratedIntensity * extinctionToCamera;
 				transmittanceIntensitiesDepthAccumulator.b += integratedIntensityAmbient * extinctionToCamera;
