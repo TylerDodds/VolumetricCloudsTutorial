@@ -42,7 +42,7 @@
 		finalColor.a = LinearToGammaSpaceExact(finalColor.a);
 		#endif
 		return finalColor;
-		//TODO handle clouds in front of transparent objects? do clouds first then skybox 'underneath' with its own separate blending?
+		//TODO Handle clouds in front of transparent objects? do clouds first then skybox 'underneath' with its own separate blending?
 	}
 
 	ENDCG

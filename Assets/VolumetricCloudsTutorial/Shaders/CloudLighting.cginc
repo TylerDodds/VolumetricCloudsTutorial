@@ -28,7 +28,7 @@ float GetLightCloudOpticalDistance(float3 worldPos)
 {
 	float3 lightDirWorld = GetWorldSpaceLightDirection();
 
-	float opticalDistance = 0;
+	float densityIntegral = 0;
 	float mipmapOffset = 0.5;
 
 	[unroll]
@@ -43,13 +43,13 @@ float GetLightCloudOpticalDistance(float3 worldPos)
 		float3 animatedPos;
 		const float baseDensity = GetBaseDensity(worldPos, mipmapOffset, wetness, animatedPos, heightFraction, erosion);
 		const float density = GetFinalDensity(max(0,baseDensity));//Since base density can be negative, ensure we clamp at 0 in physical calculation
-		opticalDistance += density * stepSize;
+		densityIntegral += density * stepSize;
 
 		mipmapOffset += 0.5;
 		worldPos += delta;
 	}
 
-	return opticalDistance;
+	return densityIntegral * _SigmaExtinction;
 }
 
 float LightenTransmittance(float transmittance, float cosTheta)
@@ -67,7 +67,7 @@ float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float heig
 	const float cosTheta = dot(viewDir, GetWorldSpaceLightDirection());
 
 	const float lightDirectionOpticalDistance = GetLightCloudOpticalDistance(worldPos);
-	const float lightTransmittance = exp(-_SigmaExtinction * lightDirectionOpticalDistance);
+	const float lightTransmittance = exp(-lightDirectionOpticalDistance);
 	const float baseTransmittance = LightenTransmittance(lightTransmittance, cosTheta);
 
 	float result = 0.0f;
@@ -80,7 +80,6 @@ float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float heig
 		result += phase * transmittance * pow(_MultiScatteringFactors_Extinction_Eccentricity_Intensity.z, octaveIndex);
 	}
 
-	//TODO Depth scattering probability
 	float verticalScatteringRate = pow(RemapClamped(heightFraction, _HeightScattering_Low_High_Min_Power.x, _HeightScattering_Low_High_Min_Power.y, _HeightScattering_Low_High_Min_Power.z, 1.0), _HeightScattering_Low_High_Min_Power.w);
 	float depthScatteringBase = pow(saturate(baseDensity), RemapClamped(heightFraction, _DepthScattering_Low_High_Min_Max.x, _DepthScattering_Low_High_Min_Max.y, _DepthScattering_Low_High_Min_Max.z, _DepthScattering_Low_High_Min_Max.w));
 	float depthScatteringRate = lerp(0.05 + depthScatteringBase, 1.0, saturate(lightDirectionOpticalDistance / stepSize));
