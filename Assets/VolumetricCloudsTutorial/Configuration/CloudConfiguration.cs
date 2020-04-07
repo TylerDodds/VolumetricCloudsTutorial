@@ -153,10 +153,12 @@ namespace VolumetricCloudsTutorial.Configuration
         [SerializeField] [Range(0, 2)] float _depthScatteringMaxPower = 2.0f;
         public float DepthScatteringMaxPower { get { return _depthScatteringMaxPower; } }
 
-        [SerializeField] Color _ambientColor = new Color(.8f, .8f, .8f);
-        public Color AmbientColor { get { return _ambientColor; } }
+        [SerializeField] Color _ambientBottom = new Color(.2f, .2f, .2f);
+        public Color AmbientBottom { get { return _ambientBottom; } }
 
-        
+        [SerializeField] Color _ambientTop = new Color(.25f, .25f, .15f);
+        public Color AmbientTop { get { return _ambientTop; } }
+
 
         /// <summary> Sets cloud shader properties for the given material based on the configuration values. </summary>
         public void SetMaterialProperties(Material material)
@@ -201,7 +203,8 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetVector("_MultiScatteringFactors_Extinction_Eccentricity_Intensity", new Vector4(MultiScatteringExtinctionFactor, MultiScatteringEccentricityFactor, MultiScatteringIntensityFactor, 0));
             material.SetVector("_HeightScattering_Low_High_Min_Power", new Vector4(HeightScatteringLowFraction, HeightScatteringHighFraction, HeightScatteringMinProbability, HeightScatteringPower));
             material.SetVector("_DepthScattering_Low_High_Min_Max", new Vector4(DepthScatteringLowFraction, DepthScatteringHighFraction, DepthScatteringMinPower, DepthScatteringMaxPower));
-            material.SetColor("_AmbientColor", AmbientColor);
+            material.SetColor("_AmbientBottom", AmbientBottom);
+            material.SetColor("_AmbientTop", AmbientTop);
         }
 
         private const string _unpackCurlKeyword = "UNPACK_CURL";

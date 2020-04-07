@@ -61,7 +61,7 @@ float2 GetAmbientIntensityTopBottom(float heightFraction, float sigmaExtinction)
 	// Additional modulation
 	isotropicScatteringTop *= saturate(heightFraction * 0.5);
 
-	return float2(isotropicScatteringTop, isotropicScatteringBottom);
+	return float2(isotropicScatteringBottom, isotropicScatteringTop);
 }
 
 #endif // VCT_LIGHT_UTIL_INCLUDED

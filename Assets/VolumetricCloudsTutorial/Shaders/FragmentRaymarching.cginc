@@ -9,7 +9,7 @@
 /// From pixel shader fragment information, reconstruct scene depth and view ray position for raymarching. 
 /// Get raymarch interval based on earth's size, and perform raymarching.
 /// Returns transmittance, sun intensity fraction, ambient intensity fraction
-float4 FragmentTransmittanceAndIntegratedIntensityAndDepth(float2 uv_depth, float3 ray, float offset, sampler2D _CameraDepthTexture, out float3 worldSpaceDirection)
+float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, float3 ray, float offset, sampler2D _CameraDepthTexture, out float3 worldSpaceDirection, out float depthWeighted)
 {
 	float3 startPos = _WorldSpaceCameraPos + ray;
 	worldSpaceDirection = normalize(ray);
@@ -40,8 +40,8 @@ float4 FragmentTransmittanceAndIntegratedIntensityAndDepth(float2 uv_depth, floa
 		return float4(1, 0, 0, _farDepth);
 	}
 
-	float4 transmittanceAndIntensitiesAndDepth = RaymarchTransmittanceAndIntegratedIntensityAndDepth(raymarchStart, worldSpaceDirection, raymarchDistance, startPos, offset);
-	return transmittanceAndIntensitiesAndDepth;
+	float4 transmittanceAndIntensities = RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(raymarchStart, worldSpaceDirection, raymarchDistance, startPos, offset, depthWeighted);
+	return transmittanceAndIntensities;
 }
 
 #endif // VCT_FRAGMENT_RAYMARCHING_INCLUDED

@@ -13,7 +13,8 @@
 	#include "NoiseTextureUtil.cginc"
 
 	sampler2D_float _CameraDepthTexture;
-	uniform float4 _AmbientColor;
+	uniform float4 _AmbientBottom;
+	uniform float4 _AmbientTop;
 
 	/// Perform raymarching in the view direction to determine transmittance and intensity, 
 	/// then find final pixel color.
@@ -27,11 +28,10 @@
 
 		float3 worldSpaceDirection;
 		const float offset = 0;
-		float4 transmittanceAndintegratedIntensityAndDepth = FragmentTransmittanceAndIntegratedIntensityAndDepth(i.uv_depth, i.ray, offset, _CameraDepthTexture, worldSpaceDirection);
+		float depthWeight;
+		float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(i.uv_depth, i.ray, offset, _CameraDepthTexture, worldSpaceDirection, depthWeight);
 
-		fixed3 ambient = _AmbientColor;
-
-		float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(transmittanceAndintegratedIntensityAndDepth, ambient);
+		float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(transmittanceAndIntegratedIntensities, _AmbientBottom, _AmbientTop);
 
 		raymarchColor *= (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceDirection.y));//Multiply by fade-out factor for far-away clouds, acting like 'fade to skybox' (really should fade to atmospheric scattering value).
 		//TODO A whole atmospheric scattering solution is needed if we don't wish to perform this simple approximation.
