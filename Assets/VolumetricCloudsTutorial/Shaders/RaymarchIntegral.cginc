@@ -11,7 +11,7 @@ uniform float _SigmaScattering = 0.1;
 
 /// Returns transmittance, sun intensity fraction, ambient intensity fraction, and depth for a given
 /// raymarch starting positiong and direction, raymarch distance, view vector start position, and offset along the ray.
-float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart, float3 worldDirection, float distance, float3 startPos, float offset)
+float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStart, float3 worldDirection, float distance, float3 startPos, float offset, out float depthWeight)
 {
 	int numSteps = GetNumberOfSteps(distance);
 	float stepSizeBase = distance / numSteps;
@@ -20,6 +20,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart,
 	float3 worldMarchPos = raymarchStart + currentOffset * worldDirection;
 
 	float4 transmittanceIntensitiesDepthAccumulator = float4(1, 0, 0, 0);
+	depthWeight = 0;
 	float depthWeightSum = 0;
 	float mipLod = 0;
 
@@ -45,20 +46,21 @@ float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart,
 				const float transmittance = exp(-extinction * stepSizeBase);
 
 				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, baseDensityCurrent, stepSizeBase) * lerp(1.0, _wetIntensityFraction, wetness);
+				float2 scatteredAmbientIntensities = scattering * GetAmbientIntensityTopBottom(heightFraction, _SigmaExtinction);
 
 				float integratedIntensity = (scatteredIntensity - scatteredIntensity * transmittance) / clampedExtinction;
-				float integratedIntensityAmbient = (scattering - scattering * transmittance) / clampedExtinction;//Multi-scattering approximation only on the sun-light term, not ambient term
+				float2 integratedAmbientIntensities = (scatteredAmbientIntensities - scatteredAmbientIntensities * transmittance) / clampedExtinction;//Multi-scattering approximation only on the sun-light term, not ambient term
 				//TODO Determine correct extinction-to-camera value. Wrennige's brief paper seems to indicate it's only the shadow extinction term, not the to-camera term, so we're just 'lightening' the light reaching the sample point, not affecting our blending operator.
 
 				float extinctionToCamera = transmittanceIntensitiesDepthAccumulator.r;
 				// TODO Adjustments for ambient intensity from scattering?
 
 				transmittanceIntensitiesDepthAccumulator.g += integratedIntensity * extinctionToCamera;
-				transmittanceIntensitiesDepthAccumulator.b += integratedIntensityAmbient * extinctionToCamera;
+				transmittanceIntensitiesDepthAccumulator.ba += integratedAmbientIntensities * extinctionToCamera;
 				transmittanceIntensitiesDepthAccumulator.r *= transmittance;
 
 				float depthWeight = (1 - transmittance);
-				transmittanceIntensitiesDepthAccumulator.w += depthWeight * length(worldMarchPos - startPos);
+				depthWeight += depthWeight * length(worldMarchPos - startPos);
 				depthWeightSum += depthWeight;
 			}
 
@@ -67,10 +69,10 @@ float4 RaymarchTransmittanceAndIntegratedIntensityAndDepth(float3 raymarchStart,
 			worldMarchPos = raymarchStart + currentOffset * worldDirection;
 		}
 
-	transmittanceIntensitiesDepthAccumulator.w /= max(depthWeightSum, 1e-6);
-	if (transmittanceIntensitiesDepthAccumulator.w == 0.0f)
+	depthWeight /= max(depthWeightSum, 1e-6);
+	if (depthWeight == 0.0f)
 	{
-		transmittanceIntensitiesDepthAccumulator.w = length(worldMarchPos - startPos);
+		depthWeight = length(worldMarchPos - startPos);
 	}
 
 	return transmittanceIntensitiesDepthAccumulator;
