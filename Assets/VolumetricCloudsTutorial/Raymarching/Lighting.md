@@ -61,7 +61,7 @@ yielding a still-normalized phase function that has some aspects of both.
 However, we instead take the maximum:
 max(p<sub>g<sub>+</sub></sub>(&theta;), p<sub>g<sub>-</sub></sub>(&theta;)).
 Although the result is not normalized, it will yield more pronounced highlights.
-Our [multi-scattering approximation](#multi-scattering-approximation) will also
+Our [multiple-scattering approximation](#multiple-scattering-approximation) will also
 alter the single scattering approximation in a non-normalized manner. In both
 cases, we rely not on physical correctness, but on achieving the desired look.
 
@@ -83,7 +83,7 @@ by approximating the density integral &int;<sub>0</sub><sup>D</sup>&rho;(z)dz.
 Like any other integral approximation, we'll sample the density, &rho;$, at
 various positions, and weight each according to the step size. Keeping in mind
 the performance constraint we just discussed, we'll keep the number of samples
-very low, around 5. We'll only
+very low, around 5.
 
 Thanks to the exponential function in the transmittance, when the optical
 distance is small, small changes will have a bigger effect on decreasing the
@@ -123,7 +123,7 @@ Finally, we take the maximum of the lightened and base transmissions, since the
 goal is to prevent our single-scattering approximation from giving transmittance
 values that look too dark.
 
-## Multi-Scattering Approximation
+## Multiple Scattering Approximation
 
 One simple approximation that can be used to achieved some of the look of
 multiple scattering is [discussed by Wrennige](http://magnuswrenninge.com/publications/attachment/wrenninge-ozthegreatandvolumetric),
@@ -196,7 +196,68 @@ depth scattering probability.
 
 ## Ambient Lighting
 
-TODO
+In our implementation of a [multiple scattering approximation](#multiple-scattering-approximation),
+we added several differently-parameterized single-scattering lighting.
+We can also approach multiple-scattering approximations from the other end of the
+directionality spectrum; namely, non-directional ambient light.
+In this approach, we take a simple approximation to the final form of the light
+that will have been a result of many scattering events through the clouds,
+atmosphere, and the earth's surface.
+In this way, we can add some of the illumination that would otherwise be missing
+in our single-scattering approach, even with a multiple-scattering approximation.
+
+### Single-Color Ambient
+
+The simplest case is to assume that this ambient light is not only
+independent of direction, but also independent of position. This can be
+parametrized by just a single color.
+We treat this as an additional source of light that comes from all directions,
+and gets scattered back in the direction of the camera.
+Therefore, we really need to take the integral overall _incoming_ ambient light
+directions, with a uniform phase factor, to determine the intensity of ambient
+light being included in our raymarch. This will exactly cancel out the phase
+factor, leading to the full intensity of the ambient light being scattered in
+the direction of the camera. Namely, S(a) = 1, as a fraction of the ambient
+light intensity, which be included in the scattering
+integral in the [raymarching](Raymarching.md).
+
+### Top and Bottom Ambient
+
+Like many other density parameters, we could also parametrize the ambient color
+by height. By choosing a different color for the bottom and the top of the
+clouds, we can capture colors of reflections from the earth (bottom) and the
+color of the sky (top). We'll track the top and bottom intensities separately
+in the raymarching, and compute the final color at [the end](#final-lighting).
+
+We can take a slightly different approach
+inspired by that of Patapom (see the accompanying
+[real-time volumetric rendering course notes](https://patapom.com/topics/Revision2013/)).
+The idea is to treat the top ambient lighting as coming uniformly from a slab at
+the top of the atmosphere, and to treat the _amount_ of light reaching the
+raymarch point as though the clouds were slab of uniform density and extinction
+factor (and the same for a slab at the bottom).
+The result for the bottom ambient terms ends up being the following:
+exp(-heightScattering) + heightScattering * EI(-heightScattering),
+where EI is the [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral)
+and heightScattering = &sigma;<sub>extinction</sub> * distanceFromBottom.
+
+However, except for very small extinction factors, this tends to yield noticeable
+ambient light contribution only on the bottom of the clouds.
+The height-based density per cloud type, as discussed in
+[Cloud Density](../CloudDensity/CloudDensity.md), will tend to not stretch the
+full extent of the atmosphere's height.
+
+However, looking at the _shape_ of the falloff, we see a function that
+decreases with a nonlinear falloff, but less quickly than an exponential would.
+We'll ignore the implicit distance scale in the height distance and the
+extinction parameter, and instead take heightScattering to simply be the
+height fraction.
+
+We can also shape the height-intensity profile further. We'll multiply the top
+intensity by `saturate(heightFraction * 2)` to reduce the effect of the top
+color on the bottom of the clouds.
+
+TODO - particularly, comparison vs. simple interpolation of color
 
 ## Final Lighting
 
