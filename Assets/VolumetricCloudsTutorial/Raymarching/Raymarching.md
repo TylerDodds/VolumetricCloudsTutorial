@@ -322,7 +322,7 @@ this will not give an energy-conserving transmittance.
 The best way to see this is to consider that the integrand changes as a function
 of the depth z, even if we're assuming that the density is constant.
 In this case, the scattering S(z), depending only on the density, is constant,
-and we can approximate is as S(a). However, the transmittance is not,
+and we can approximate is as S(a). However, the transmittance is not:
 T(z) = exp(-&int;<sub>0</sub><sup>a</sup>&sigma;(x)dx -
 &int;<sub>a</sub><sup>z</sup>&sigma;(x)dx) for z between a and a+&Delta;z.
 Then we can again use exponent rules, so
@@ -339,12 +339,13 @@ Then S<sub>a</sub> &asymp;
 We can perform this integral of the exponential function analytically:
 &int;<sub>a</sub><sup>a+&Delta;z</sup> exp(-z&sigma;(a)) dz =
 [-exp(-z&sigma;(a))/&sigma;(a)]<sub>a</sub><sup>a+&Delta;z</sup> =
-exp(-a &sigma;(a)) - exp(-(&Delta;z+a)&sigma;(a)). Using exponent rules we pull out a
-constant factor: exp(-a &sigma;(a))[1 - exp(-&sigma;(a)&Delta;z)].
+[exp(-a &sigma;(a)) - exp(-(&Delta;z+a)&sigma;(a))] / &sigma;(a).
+Using exponent rules we pull out a constant factor:
+exp(-a &sigma;(a))[1 - exp(-&sigma;(a)&Delta;z)] / &sigma;(a).
 
 Adding this to our previous approximation to S<sub>a</sub>, we have
-S(a) T(a) exp(a&sigma;(a)) exp(-a&sigma;(a)) [1 - exp(-&sigma;(a)&Delta;z)] =
-S(a) T(a) [1 - exp(-&sigma;(a)&Delta;z)].
+S(a) T(a) exp(a&sigma;(a)) exp(-a&sigma;(a)) [1 - exp(-&sigma;(a)&Delta;z)] / &sigma;(a) =
+S(a) T(a) [1 - exp(-&sigma;(a)&Delta;z)]  / &sigma;(a).
 
 Note that we need to find -&sigma;(a)&Delta;z to update transmittance, and we
 have stored the previous value of T(a) from the last raymarch step, so to
