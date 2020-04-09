@@ -60,9 +60,18 @@ float LightenTransmittance(float transmittance, float cosTheta)
 	return max(transmittance, lightenedTransmittance * lightenedFrac);
 }
 
+float GetIsotropicScatteringRate(float heightFraction, float baseDensity, float stepSize, float lightDirectionOpticalDistance)
+{
+	float verticalScatteringRate = pow(RemapClamped(heightFraction, _HeightScattering_Low_High_Min_Power.x, _HeightScattering_Low_High_Min_Power.y, _HeightScattering_Low_High_Min_Power.z, 1.0), _HeightScattering_Low_High_Min_Power.w);
+	float depthScatteringBase = pow(saturate(baseDensity), RemapClamped(heightFraction, _DepthScattering_Low_High_Min_Max.x, _DepthScattering_Low_High_Min_Max.y, _DepthScattering_Low_High_Min_Max.z, _DepthScattering_Low_High_Min_Max.w));
+	float depthScatteringRate = lerp(0.05 + depthScatteringBase, 1.0, saturate(lightDirectionOpticalDistance / stepSize));
+	float isotropicScatteringRate = verticalScatteringRate * depthScatteringRate;
+	return isotropicScatteringRate;
+}
+
 /// At a given point in the cloud and view direction from the camera, determine the 
 /// intensity of scattered light from the sun through this point to the camera.
-float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float heightFraction, float baseDensity, float stepSize)
+float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float heightFraction, float baseDensity, float stepSize, out float isotropicScatteringRate)
 {
 	const float cosTheta = dot(viewDir, GetWorldSpaceLightDirection());
 
@@ -80,10 +89,8 @@ float GetSunLightScatteringIntensity(float3 worldPos, float3 viewDir, float heig
 		result += phase * transmittance * pow(_MultiScatteringFactors_Extinction_Eccentricity_Intensity.z, octaveIndex);
 	}
 
-	float verticalScatteringRate = pow(RemapClamped(heightFraction, _HeightScattering_Low_High_Min_Power.x, _HeightScattering_Low_High_Min_Power.y, _HeightScattering_Low_High_Min_Power.z, 1.0), _HeightScattering_Low_High_Min_Power.w);
-	float depthScatteringBase = pow(saturate(baseDensity), RemapClamped(heightFraction, _DepthScattering_Low_High_Min_Max.x, _DepthScattering_Low_High_Min_Max.y, _DepthScattering_Low_High_Min_Max.z, _DepthScattering_Low_High_Min_Max.w));
-	float depthScatteringRate = lerp(0.05 + depthScatteringBase, 1.0, saturate(lightDirectionOpticalDistance / stepSize));
-	result *= verticalScatteringRate * depthScatteringRate;
+	isotropicScatteringRate = GetIsotropicScatteringRate(heightFraction, baseDensity, stepSize, lightDirectionOpticalDistance);
+	result *= isotropicScatteringRate;
 
 	return result;
 }
