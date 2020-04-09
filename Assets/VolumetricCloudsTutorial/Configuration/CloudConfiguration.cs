@@ -153,10 +153,10 @@ namespace VolumetricCloudsTutorial.Configuration
         [SerializeField] [Range(0, 2)] float _depthScatteringMaxPower = 2.0f;
         public float DepthScatteringMaxPower { get { return _depthScatteringMaxPower; } }
 
-        [SerializeField] Color _ambientBottom = new Color(.2f, .2f, .2f);
+        [SerializeField] [ColorUsage(false, true)] Color _ambientBottom = new Color(.2f, .2f, .2f);
         public Color AmbientBottom { get { return _ambientBottom; } }
 
-        [SerializeField] Color _ambientTop = new Color(.25f, .25f, .15f);
+        [SerializeField] [ColorUsage(false, true)] Color _ambientTop = new Color(.25f, .25f, .15f);
         public Color AmbientTop { get { return _ambientTop; } }
 
 

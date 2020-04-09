@@ -221,6 +221,16 @@ the direction of the camera. Namely, S(a) = 1, as a fraction of the ambient
 light intensity, which be included in the scattering
 integral in the [raymarching](Raymarching.md).
 
+### Ambient Scattering Rate
+
+Although the main raymarch handles the scattering rate due to the current
+position's density, we have also consider other
+[scattering rate multipliers](#other-scattering-multipliers) for the lighting
+that were meant to consider the effect of scattering in the neighbourhood around
+that position. Since these effects are implicitly trying to model the type of
+behavior due to multiple scattering events, we may also include them in
+determining the scattering of ambient light.
+
 ### Top and Bottom Ambient
 
 Like many other density parameters, we could also parametrize the ambient color
