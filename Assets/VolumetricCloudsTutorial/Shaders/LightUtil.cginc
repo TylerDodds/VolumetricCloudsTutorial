@@ -50,16 +50,17 @@ float ExponentialIntegral(float z)
 
 ///Approximation to ambient intensity assuming homogeneous radiance coming separately form top and bottom of clouds.
 ///See Real-Time Volumetric Rendering course notes By Patapom / Bomb! 
+///Uses the general shape of intensity over height, but skips the extinction parameter and associated height scale.
 float2 GetAmbientIntensityTopBottom(float heightFraction, float sigmaExtinction)
 {
-	float ambientTerm = -sigmaExtinction * saturate(1.0 - heightFraction);
+	float ambientTerm = - saturate(1.0 - heightFraction);
 	float isotropicScatteringTop = max(0.0, exp(ambientTerm) - ambientTerm * ExponentialIntegral(ambientTerm));
 
-	ambientTerm = -sigmaExtinction * heightFraction;
+	ambientTerm = - heightFraction;
 	float isotropicScatteringBottom = max(0.0, exp(ambientTerm) - ambientTerm * ExponentialIntegral(ambientTerm));
 
 	// Additional modulation
-	isotropicScatteringTop *= saturate(heightFraction * 0.5);
+	isotropicScatteringTop *= saturate(heightFraction * 2);
 
 	return float2(isotropicScatteringBottom, isotropicScatteringTop);
 }
