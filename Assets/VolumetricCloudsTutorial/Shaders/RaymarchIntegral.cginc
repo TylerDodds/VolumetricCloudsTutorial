@@ -11,7 +11,7 @@ uniform float _SigmaScattering = 0.1;
 
 /// Returns transmittance, sun intensity fraction, ambient intensity fraction, and depth for a given
 /// raymarch starting positiong and direction, raymarch distance, view vector start position, and offset along the ray.
-float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStart, float3 worldDirection, float distance, float3 startPos, float offset, out float depthWeight)
+float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStart, float3 worldDirection, float distance, float3 startPos, float offset, out float depthApprox)
 {
 	int numSteps = GetNumberOfSteps(distance);
 	float stepSizeBase = distance / numSteps;
@@ -20,7 +20,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 	float3 worldMarchPos = raymarchStart + currentOffset * worldDirection;
 
 	float4 transmittanceIntensitiesDepthAccumulator = float4(1, 0, 0, 0);
-	depthWeight = 0;
+	depthApprox = 0;
 	float depthWeightSum = 0;
 	float mipLod = 0;
 
@@ -61,7 +61,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 				transmittanceIntensitiesDepthAccumulator.r *= transmittance;
 
 				float depthWeight = (1 - transmittance);
-				depthWeight += depthWeight * length(worldMarchPos - startPos);
+				depthApprox += depthWeight * length(worldMarchPos - startPos);
 				depthWeightSum += depthWeight;
 			}
 
@@ -70,10 +70,10 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 			worldMarchPos = raymarchStart + currentOffset * worldDirection;
 		}
 
-	depthWeight /= max(depthWeightSum, 1e-6);
-	if (depthWeight == 0.0f)
+	depthApprox /= max(depthWeightSum, 1e-6);
+	if (depthApprox == 0.0f)
 	{
-		depthWeight = length(worldMarchPos - startPos);
+		depthApprox = length(worldMarchPos - startPos);
 	}
 
 	return transmittanceIntensitiesDepthAccumulator;
