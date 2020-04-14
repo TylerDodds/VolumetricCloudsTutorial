@@ -271,7 +271,24 @@ TODO - particularly, comparison vs. simple interpolation of color
 
 ## Final Lighting
 
-TODO
+After the raymarching has been performed, we have the final transmittance from
+the end point of the raymarch to the camera, as well as integrated intensity
+_fractions_ for the sun (directional), ambient top, and ambient bottom light
+sources.
+
+Since `1 - Transmittance` is the opacity, this becomes the alpha channel value
+for the cloud color. By multiplying the three intensity fractions by the three
+associated light colors, we get the RGB portion of the color. Note that since our
+raymarching already took transmittance into account, the final RGBA color value
+is using [_premultiplied alpha_](https://en.wikipedia.org/wiki/Alpha_compositing#Straight_versus_premultiplied).
+
+Why do we accumulate three intensity fraction values in the raymarching, instead
+of the RGB light intensity values directly? One, we can save a few
+multiplications at each step, but this effect is negligible. Two, it affords us
+additional flexibility in how we encode these intensity fractions. This is
+important when we try to use the previous frame's raymrach result to improve
+the final look -- we will save the intensity fractions from frame to frame, and
+have full control how those values are encoded and stored.
 
 ## Color Space
 
