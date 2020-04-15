@@ -267,7 +267,15 @@ We can also shape the height-intensity profile further. We'll multiply the top
 intensity by `saturate(heightFraction * 2)` to reduce the effect of the top
 color on the bottom of the clouds.
 
-TODO - particularly, comparison vs. simple interpolation of color
+Finally, we can consider an even simpler, but more approximate, method of
+handling the ambient color changing with height. We track only the total ambient
+scattering intensity in the raymarch. Then, by using the raymarch's average
+depth value, we can reconstruct the corresponding average position along the ray
+that depth from the starting point. Using that average point's height, we can
+combine the top and bottom ambient colors in any way -- linearly, with some
+falloff (like discussed above), or perhaps even using a gradient of colors.
+However, we will instead use the top-and-bottom-intensity raymarching discussed
+above, preferring the look of the final output.
 
 ## Final Lighting
 
@@ -286,7 +294,7 @@ Why do we accumulate three intensity fraction values in the raymarching, instead
 of the RGB light intensity values directly? One, we can save a few
 multiplications at each step, but this effect is negligible. Two, it affords us
 additional flexibility in how we encode these intensity fractions. This is
-important when we try to use the previous frame's raymrach result to improve
+important when we try to use the previous frame's raymarch result to improve
 the final look -- we will save the intensity fractions from frame to frame, and
 have full control how those values are encoded and stored.
 
