@@ -6,7 +6,19 @@ Performing raymarching each frame is expensive. Instead of adding additional
 steps to each frame, we can instead try to use previous frames' results to
 supplement the current frame's results.
 
-TODO - discuss Nubis-style high-quality raymarching one pixel per frame per group
+We can consider two main styles of approach. The first is to perform raymarching
+at very small step size, but update only one pixel in a group of neighbours each
+frame. This approach is taken by the Nubis system, evaluating one pixel in a
+group of 4x4 each frame.
+
+The second is to perform raymarching at a more moderate step size, but update
+each pixel every frame, relying on the time average to ontain higher-quality
+results than the step size alone could achieve. This is the approach taken by
+Frostbite, as can be seen in yangrc1234's
+[VolumeCloud GitHub repo](https://github.com/yangrc1234/VolumeCloud) --
+particularly check out the corresponding notes on the
+[implementation details](https://github.com/yangrc1234/VolumeCloud/blob/master/IMPLEMENTATIONDETAIL.md).
+This is the approach we will also follow.
 
 TODO
 
@@ -46,7 +58,15 @@ at a much finer level of detail over each step. This way, we can average over
 raymarch contributions along each step by combining previous intensity values
 with the current ones.
 
-TODO - discuss low discrepancy sequence
+We'd like our offset to cover the range [0, 1] uniformly, and to continue to do
+so as additional frame pass. A
+[low-discrepancy sequence](https://en.wikipedia.org/wiki/Low-discrepancy_sequence)
+perfectly fits the bill for this. We implement a simple one-dimensional
+[Halton sequence](https://en.wikipedia.org/wiki/Halton_sequence) in
+`LowDiscrepancySequence.cs`.
+
+
+
 TODO - discuss non-equal steps
 
 ## Passes
