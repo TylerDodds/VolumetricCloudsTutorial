@@ -94,6 +94,36 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         }
 
         /// <summary>
+        /// Sets a multiple RenderTarget <paramref name="setup"/>, and
+        /// performs a full-screen pass indicated by the <paramref name="material"/> and <paramref name="pass"/>.
+        /// </summary>
+        /// <param name="setup">The <see cref="RenderBuffer"/> setup.</param>
+        /// <param name="clearDepth">If depth buffer should be cleared.</param>
+        /// <param name="material">The material to be used for drawing.</param>
+        /// <param name="pass">The material's pass to be used for drawing.</param>
+        protected static void BlitMRT(RenderTargetSetup setup, bool clearDepth, Material material, int pass)
+        {
+            Graphics.SetRenderTarget(setup);
+
+            GL.Clear(clearDepth, true, Color.clear);
+
+            GL.PushMatrix();
+            GL.LoadOrtho();
+
+            material.SetPass(pass);
+
+            //Render the full screen quad manually.
+            GL.Begin(GL.QUADS);
+            GL.TexCoord2(0.0f, 0.0f); GL.Vertex3(0.0f, 0.0f, 0.1f);
+            GL.TexCoord2(1.0f, 0.0f); GL.Vertex3(1.0f, 0.0f, 0.1f);
+            GL.TexCoord2(1.0f, 1.0f); GL.Vertex3(1.0f, 1.0f, 0.1f);
+            GL.TexCoord2(0.0f, 1.0f); GL.Vertex3(0.0f, 1.0f, 0.1f);
+            GL.End();
+
+            GL.PopMatrix();
+        }
+
+        /// <summary>
         /// Draws a full-screen quad to the destination RenderTexture using <see cref="GL"/> commands.
         /// </summary>
         /// <param name="camera">The Camera</param>

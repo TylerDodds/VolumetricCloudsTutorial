@@ -63,11 +63,11 @@ so as additional frame pass. A
 [low-discrepancy sequence](https://en.wikipedia.org/wiki/Low-discrepancy_sequence)
 perfectly fits the bill for this. We implement a simple one-dimensional
 [Halton sequence](https://en.wikipedia.org/wiki/Halton_sequence) in
-`LowDiscrepancySequence.cs`.
+`LowDiscrepancySequence.cs`. Each time we perform the image effect, we get the
+next value in the sequence as the raymarch offset.
 
-
-
-TODO - discuss non-equal steps
+This ties into the discussion of non-equal step sizes in
+[Raymarching](Raymarching.md).
 
 ## Passes
 
