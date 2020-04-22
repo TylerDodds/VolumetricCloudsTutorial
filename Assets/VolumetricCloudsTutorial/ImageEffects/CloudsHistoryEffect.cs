@@ -35,6 +35,40 @@ namespace VolumetricCloudsTutorial.ImageEffects
         /// <param name="destination">The destination RenderTexture</param>
         protected override void PerformEffect(Material material, Camera camera, RenderTexture source, RenderTexture destination)
         {
+            int width = source.width >> _downsample;
+            int height = source.height >> _downsample;
+
+            if (_historyDoubleBuffers == null)
+            {
+                _historyDoubleBuffers = new RenderTexture[2];
+            }
+            _isFirstFrame |= EnsureRenderTexture(ref _historyDoubleBuffers[0], width, height, RenderTextureFormat.ARGBFloat, FilterMode.Bilinear);
+            _isFirstFrame |= EnsureRenderTexture(ref _historyDoubleBuffers[1], width, height, RenderTextureFormat.ARGBFloat, FilterMode.Bilinear);
+            _isFirstFrame |= EnsureRenderTexture(ref _raymarchedBuffer, width, height, RenderTextureFormat.ARGBFloat, FilterMode.Bilinear);
+            _isFirstFrame |= EnsureRenderTexture(ref _raymarchAvgDepthBuffer, width, height, RenderTextureFormat.RFloat, FilterMode.Bilinear);
+            if(_raymarchColorBuffers == null || _raymarchColorBuffers.Length != 2)
+            {
+                _raymarchColorBuffers = new RenderBuffer[] { _raymarchedBuffer.colorBuffer, _raymarchAvgDepthBuffer.colorBuffer };
+            }
+            else
+            {
+                _raymarchColorBuffers[0] = _raymarchedBuffer.colorBuffer;
+                _raymarchColorBuffers[1] = _raymarchAvgDepthBuffer.colorBuffer;
+            }
+
+            _historyIndex = (_historyIndex + 1) % 2;
+
+            RenderTargetSetup raymarchRenderTargetSetup = new RenderTargetSetup(_raymarchColorBuffers, _raymarchedBuffer.depthBuffer);
+
+            //Pass 0 into raymarched buffer, with regular sampling quality.
+            material.SetVector("_ProjectionExtents", GetProjectionExtents(camera));
+            material.SetFloat("_RaymarchOffset", _lowDiscrepancySequence.GetNextValue());
+            material.SetVector("_RaymarchedBuffer_TexelSize", _raymarchedBuffer.texelSize);
+
+            BlitMRT(raymarchRenderTargetSetup, false, material, 0);
+
+            Graphics.Blit(_raymarchedBuffer, destination);//TODO - rest of passes
+
             //TODO
         }
 
@@ -53,8 +87,12 @@ namespace VolumetricCloudsTutorial.ImageEffects
         /// <summary>Two RenderTextures storing the raymarch history. 
         /// Double-buffered so we can  </summary>
         private RenderTexture[] _historyDoubleBuffers;
-        /// <summary> Stores intensity and depth raymarch results calculated for the current frame. </summary>
+        /// <summary> Stores intensity raymarch results calculated for the current frame. </summary>
         private RenderTexture _raymarchedBuffer;
+        /// <summary> Stores depth raymarch results calculated for the current frame. </summary>
+        private RenderTexture _raymarchAvgDepthBuffer;
+        /// <summary> Stores color buffers of raymarch intensity and depth RenderTextures. </summary>
+        private RenderBuffer[] _raymarchColorBuffers;
         /// <summary> If this is the first time a frame is being rendered. </summary>
         private bool _isFirstFrame = true;
         /// <summary> Index of the history buffers containing the previous frame's history.</summary>
