@@ -21,7 +21,8 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, fl
 	if (zsample < 1)
 	#endif
 	{
-		return float4(1, 0, 0, _farDepth);
+		depthWeighted = _farDepth;
+		return float4(1, 0, 0, 0);//TODO improved handling of _fadeHorizonAngle
 		//TODO use Linear01Depth as raymarch stopping criterion instead
 	}
 	
@@ -32,12 +33,14 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, fl
 
 	if (worldSpaceDirection.y < -fadeHorizonAngle)
 	{
-		return float4(1, 0, 0, _farDepth);//TODO improved handling of _fadeHorizonAngle
+		depthWeighted = _farDepth;
+		return float4(1, 0, 0, 0);//TODO improved handling of _fadeHorizonAngle
 	}
 
 	if (!GetCloudRaymarchInterval_EarthCurvature(_WorldSpaceCameraPos, worldSpaceDirection, raymarchStart, raymarchDistance, cloudHeightDistance))
 	{
-		return float4(1, 0, 0, _farDepth);
+		depthWeighted = _farDepth;
+		return float4(1, 0, 0, 0);//TODO improved handling of _fadeHorizonAngle
 	}
 
 	float4 transmittanceAndIntensities = RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(raymarchStart, worldSpaceDirection, raymarchDistance, startPos, offset, depthWeighted);
