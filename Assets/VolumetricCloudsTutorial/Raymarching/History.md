@@ -69,6 +69,24 @@ next value in the sequence as the raymarch offset.
 This ties into the discussion of non-equal step sizes in
 [Raymarching](Raymarching.md).
 
+### Render Target Setup
+
+We note that the output of our raymarching contains _five_ values that we will
+need to write to RenderTextures in Pass 0. Four of these will be used in
+determining the final color, including transmittance and three light intensity
+fractions: directional, ambient (top), and ambient (bottom).
+The average depth is not used in determining the color, so will only be used in
+the input of Pass 1, not its output into one of the history buffers.
+Therefore, `RenderTextureFormat.ARGBFloat` can be used to pack the transmittance
+and intensity values into one RenderTexture, and `RenderTextureFormat.RFloat`
+for the average depth.
+
+We can use the `Graphics.SetRenderTarget` function, specifying a
+`RenderTargetSetup` with the two color `RenderBuffer` of the `RenderTexture`s
+above. `BlitMRT` in `ImageEffectBase` handles setting up the render targets
+and material pass, then drawing the full-screen quadrilateral.
+
+
 ## Passes
 
 ### Raymarch (Low Quality)

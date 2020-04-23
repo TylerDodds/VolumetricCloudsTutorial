@@ -64,12 +64,14 @@ namespace VolumetricCloudsTutorial.ImageEffects
             material.SetVector("_ProjectionExtents", GetProjectionExtents(camera));
             material.SetFloat("_RaymarchOffset", _lowDiscrepancySequence.GetNextValue());
             material.SetVector("_RaymarchedBuffer_TexelSize", _raymarchedBuffer.texelSize);
-
             BlitMRT(raymarchRenderTargetSetup, false, material, 0);
 
-            Graphics.Blit(_raymarchedBuffer, destination);//TODO - rest of passes
-
             //TODO
+
+            //Pass 2 apply lighting and blend with scene
+            material.SetTexture("_CloudDensityTexture", _raymarchedBuffer);//TODO -- set to history buffer once pass 1 is added
+            Graphics.Blit(source, destination, material, 1);//TODO -- set to pass 2 once pass 1 is added
+
         }
 
         protected override void Awake()
