@@ -104,6 +104,60 @@
 			ENDCG
 		}
 
+		//Pass 1 - update history buffer
+		Pass
+		{
+			CGPROGRAM
+
+			#pragma vertex VertUvScreenViewPos
+			#pragma fragment FragHistory
+
+			uniform sampler2D _RaymarchedBuffer;
+			uniform sampler2D _RaymarchedAvgDepthBuffer;
+			uniform float4 _RaymarchedBuffer_TexelSize;
+			uniform float4x4 _PrevVP;
+
+			float2 GetPrevUV(float4 worldPos, out float outOfBB)
+			{
+				float4 prevProjPos = mul(_PrevVP, worldPos);
+				float2 uv = 0.5 * (prevProjPos.xy / prevProjPos.w) + 0.5;
+				half maxDistPastBBCorner = max(uv.x - 1.0, uv.y - 1.0);
+				half maxDistBeforeBBCorner = max(0.0 - uv.x, 0.0 - uv.y);
+				outOfBB = max(maxDistBeforeBBCorner, maxDistPastBBCorner);
+				return uv;
+			}
+
+			float4 FragHistory(InterpolatorsUvScreenViewPos i) : SV_Target
+			{
+				float3 viewPos = float3(i.viewRay, 1.0);
+				float4 worldPos = mul(unity_CameraToWorld, float4(viewPos, 1.0f));
+				worldPos /= worldPos.w;
+
+				//Get pass 0 raymarched result and depth
+				float4 raymarchResult = tex2D(_RaymarchedBuffer, i.uv);
+				float raymarchAvgDepthResult = tex2D(_RaymarchedAvgDepthBuffer, i.uv);
+				float distance = raymarchAvgDepthResult;
+
+				//Now get previous result
+				float4 worldPosAtDistance = mul(unity_CameraToWorld, float4(normalize(viewPos) * distance, 1.0));
+
+				float outOfProjectionBB;
+				float2 historyBufferUV = GetPrevUV(worldPosAtDistance, outOfProjectionBB);
+				float4 prevSample = tex2D(_MainTex, historyBufferUV);
+
+				//TODO Clip previous sample based on BB
+
+				//Determine how far out of bounds, and blend accordingly.
+				const float historyMinUpdateFraction = 0.05;//TODO Parametrize
+				float4 blendedSample = lerp(prevSample, raymarchResult, max(historyMinUpdateFraction, step(0, outOfProjectionBB)));//TODO Better blending?
+
+				return blendedSample;
+			}
+
+
+			ENDCG
+		}
+
 		//Pass 2 - lighting
 		Pass
 		{

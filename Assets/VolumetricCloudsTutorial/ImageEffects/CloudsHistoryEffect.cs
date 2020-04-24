@@ -66,12 +66,26 @@ namespace VolumetricCloudsTutorial.ImageEffects
             material.SetVector("_RaymarchedBuffer_TexelSize", _raymarchedBuffer.texelSize);
             BlitMRT(raymarchRenderTargetSetup, false, material, 0);
 
-            //TODO
+            //Pass 1: blending into active history buffer
+            if (_isFirstFrame)
+            {
+                Graphics.Blit(_raymarchedBuffer, _historyDoubleBuffers[_historyIndex]);
+                _previousViewMatrix = camera.worldToCameraMatrix;
+            }
+            material.SetTexture("_RaymarchedBuffer", _raymarchedBuffer);
+            material.SetTexture("_RaymarchedAvgDepthBuffer", _raymarchAvgDepthBuffer);
+            material.SetMatrix("_PrevVP", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false) * _previousViewMatrix);
 
-            //Pass 2 apply lighting and blend with scene
-            material.SetTexture("_CloudDensityTexture", _raymarchedBuffer);//TODO -- set to history buffer once pass 1 is added
-            Graphics.Blit(source, destination, material, 1);//TODO -- set to pass 2 once pass 1 is added
+            int historyOtherIndex = _historyIndex ^ 1;
+            Graphics.Blit(_historyDoubleBuffers[_historyIndex], _historyDoubleBuffers[historyOtherIndex], material, 1);
 
+            //Pass 2: apply lighting and blend with scene
+            material.SetTexture("_CloudDensityTexture", _historyDoubleBuffers[historyOtherIndex]);
+            Graphics.Blit(source, destination, material, 2);
+
+            //Cleanup
+            _previousViewMatrix = camera.worldToCameraMatrix;
+            _isFirstFrame = false;
         }
 
         protected override void Awake()
