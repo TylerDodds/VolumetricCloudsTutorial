@@ -76,7 +76,7 @@ namespace VolumetricCloudsTutorial.ImageEffects
             material.SetTexture("_RaymarchedAvgDepthBuffer", _raymarchAvgDepthBuffer);
             material.SetMatrix("_PrevVP", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false) * _previousViewMatrix);
 
-            int historyOtherIndex = _historyIndex ^ 1;
+            int historyOtherIndex = (_historyIndex + 1) % 2;
             Graphics.Blit(_historyDoubleBuffers[_historyIndex], _historyDoubleBuffers[historyOtherIndex], material, 1);
 
             //Pass 2: apply lighting and blend with scene

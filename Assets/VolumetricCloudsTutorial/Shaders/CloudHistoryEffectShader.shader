@@ -138,7 +138,7 @@
 				float raymarchAvgDepthResult = tex2D(_RaymarchedAvgDepthBuffer, i.uv);
 				float distance = raymarchAvgDepthResult;
 
-				//Now get previous result
+				//Get result from other history buffer
 				float4 worldPosAtDistance = mul(unity_CameraToWorld, float4(normalize(viewPos) * distance, 1.0));
 
 				float outOfProjectionBB;

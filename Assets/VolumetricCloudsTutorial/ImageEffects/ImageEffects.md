@@ -58,7 +58,7 @@ frame is rendered. In these cases, `Graphics.Blit` is easy to use with
 temporary RenderTextures that we create (not supplied by the source or
 destination parameters).
 
-However, using `Gl.Begin`, we can set the normal vectors of the four vertices of
+However, using `GL.Begin`, we can set the normal vectors of the four vertices of
 the quadrilateral to be the view vectors of the four corners of the frustum.
 These will be interpolated in the shader, so we can easily reconstruct the view
 ray from the camera at any point sampled.
