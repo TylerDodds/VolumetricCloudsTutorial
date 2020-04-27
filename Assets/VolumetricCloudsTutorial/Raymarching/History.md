@@ -27,7 +27,7 @@ TODO
 We will set up an ImageEffect in `CloudHistoryEffect.cs` containing multiple
 passes that will perform raymarching for the current frame, combine it with a
 historical result, then apply lighting and blend with the scene. Each of these
-steps will be a separate pass in the shader.
+steps will be a separate pass in the shader, `CloudHistoryEffectShader.shader`.
 
 * Pass 0: Raymarch intensities and average depth. We'll need to save these in a
 RenderTexture to be used in the next pass.
@@ -86,10 +86,34 @@ We can use the `Graphics.SetRenderTarget` function, specifying a
 above. `BlitMRT` in `ImageEffectBase` handles setting up the render targets
 and material pass, then drawing the full-screen quadrilateral.
 
+### History Double Buffers
+
+We will have two buffers to store the result of blending with history,
+each with the same `RenderTextureFormat.ARGBFloat` format as the raymarch
+transmittance and intensity results from Pass 0.
+Each frame, in Pass 1's `Graphics.Blit` command, we will use one of these as the
+source RenderTexture, and the other as the destination RenderTexture.
+We switch their roles every other frame, so that the output of one frame becomes
+the historical input for the next frame.
+
+### Vertex Shader
+
+The incoming vertex data requires only position and uv input data:
+`float4 vertex : POSITION` and `float2 uv : TEXCOORD0`.
+The vertex shader will forward those two values to the fragment shader, as
+well as the screen position, `float4 screenPos : TEXCOORD1` using UnityCG's
+`ComputeScreenPos`, and the view-space ray at z-distance of 1,
+`float2 viewRay : TEXCOORD2`, computed using GetProjectionExtents decribed
+in [ImageEffects](../ImageEffects/ImageEffects.md).
+
+Pass 0 does not need the uv values, so they are not forwarded to its fragment
+shader.
 
 ## Passes
 
 ### Raymarch (Low Quality)
+
+
 
 TODO
 
