@@ -55,7 +55,15 @@
 			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW
 			#pragma shader_feature UNPACK_CURL
 
-			float _RaymarchOffset;
+			float _RaymarchOffset; //Fractional offset along first step; changes every frame to avoid biased sampling
+			float2 _RaymarchedBuffer_TexelSize;	//Texel size of final buffer used to detemine neighbour offset from Bayer Matrix
+			//Dithering matrix for local relative offsets of raymarch position
+			static const float _bayerOffsets[3][3] =
+			{
+				{0, 7, 3},
+				{6, 5, 2},
+				{4, 1, 8}
+			};
 
 			struct InterpolatorsRaymarch
 			{
@@ -89,10 +97,11 @@
 				worldPos /= worldPos.w;
 				float3 rayDirUnNorm = (worldPos.xyz - _WorldSpaceCameraPos);
 
+				int2 pixelId = int2(fmod(i.screenPos / _RaymarchedBuffer_TexelSize, 3));//Repeating 0,1,2 pattern in x and y
+				float bayerOffset = _bayerOffsets[pixelId.x][pixelId.y] / 9.0;//Determines fractional offset from Bayer dithering matrix
+				float offset = -frac(_RaymarchOffset + bayerOffset);
 				float3 worldSpaceDirection;
 				float depthWeight;
-				//TODO Bayer offset?
-				float offset = -frac(_RaymarchOffset);
 				float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(uvDepth, rayDirUnNorm, offset, _CameraDepthTexture, worldSpaceDirection, depthWeight);
 
 				RaymarchResults results;
