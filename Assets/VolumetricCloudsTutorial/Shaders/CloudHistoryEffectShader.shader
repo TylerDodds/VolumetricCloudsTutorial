@@ -117,6 +117,8 @@
 			uniform float4 _RaymarchedBuffer_TexelSize;
 			uniform float4x4 _PrevVP;
 
+			//Gets the uv of the world position with respect to the previous view-projection matrix.
+			//Also return how far (in unit square coordinates) the uv is outside of the unit square.
 			float2 GetPrevUV(float4 worldPos, out float outOfBB)
 			{
 				float4 prevProjPos = mul(_PrevVP, worldPos);
@@ -125,6 +127,23 @@
 				half maxDistBeforeBBCorner = max(0.0 - uv.x, 0.0 - uv.y);
 				outOfBB = max(maxDistBeforeBBCorner, maxDistPastBBCorner);
 				return uv;
+			}
+
+			//If outside the AABB, moves value towards center until it lies on surface.
+			float4 ClipTowardsAABB(float4 center, float4 extents, float4 value)
+			{
+				float4 diff = value - center;
+				float4 diffUnit = diff / extents;
+				float4 diffUnitAbs = abs(diffUnit);
+				float diffUnitAbsMax = max(diffUnitAbs.x, max(diffUnitAbs.y, max(diffUnitAbs.z, diffUnitAbs.w)));
+				if (diffUnitAbsMax > 1.0)
+				{
+					return center + diff / diffUnitAbsMax;
+				}
+				else
+				{
+					return value;
+				}
 			}
 
 			float4 FragHistory(InterpolatorsUvScreenViewPos i) : SV_Target
@@ -145,7 +164,38 @@
 				float2 historyBufferUV = GetPrevUV(worldPosAtDistance, outOfProjectionBB);
 				float4 prevSample = tex2D(_MainTex, historyBufferUV);
 
-				//TODO Clip previous sample based on BB
+				//Get raymarch buffer local AABB for the four sample components
+				float2 raymarchXOffset = float2(_RaymarchedBuffer_TexelSize.x, 0);
+				float2 raymarchYOffset = float2(0, _RaymarchedBuffer_TexelSize.y);
+
+				//Approximate first and second moments by sampling a 3x3 pattern of the current frame's raymarched results
+				float4 firstMoment = 0.0, secondMoment = 0.0;
+				[unroll]
+				for (int dx = -1; dx <= 1; dx++)
+				{
+					[unroll]
+					for (int dy = -1; dy <= 1; dy++)
+					{
+						float4 offsetSampled;
+						if (dx == 0 && dy == 0)
+						{
+							offsetSampled = raymarchResult;
+						}
+						else
+						{
+							offsetSampled = tex2Dlod(_RaymarchedBuffer, float4(i.uv + raymarchXOffset * dx + raymarchYOffset * dy, 0.0, 0.0));
+						}
+						firstMoment += offsetSampled;
+						secondMoment += offsetSampled * offsetSampled;
+					}
+				}
+				firstMoment /= 9.0;
+				secondMoment /= 9.0;
+				float4 variance = secondMoment - firstMoment * firstMoment;
+				float4 stdDev = sqrt(max(0.0, variance));
+				const float gamma = 1.5;
+				prevSample = ClipTowardsAABB(firstMoment, gamma * stdDev, prevSample);
+				//If sample is too far in value from thosea round in, clip it to a bounding box based on average and standard deviation.
 
 				//Determine how far out of bounds, and blend accordingly.
 				const float historyMinUpdateFraction = 0.05;//TODO Parametrize
