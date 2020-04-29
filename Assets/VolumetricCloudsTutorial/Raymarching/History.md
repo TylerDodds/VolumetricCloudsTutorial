@@ -102,9 +102,9 @@ The incoming vertex data requires only position and uv input data:
 `float4 vertex : POSITION` and `float2 uv : TEXCOORD0`.
 The vertex shader will forward those two values to the fragment shader, as
 well as the screen position, `float4 screenPos : TEXCOORD1` using UnityCG's
-`ComputeScreenPos`, and the view-space ray at z-distance of 1,
-`float2 viewRay : TEXCOORD2`, computed using GetProjectionExtents decribed
-in [ImageEffects](../ImageEffects/ImageEffects.md).
+`ComputeScreenPos`, and the view-space ray xy coordinates at z-distance of 1,
+`float2 viewRay : TEXCOORD2`, computed using the results of
+GetProjectionExtents decribed in [ImageEffects](../ImageEffects/ImageEffects.md).
 
 Pass 0 does not need the uv values, so they are not forwarded to its fragment
 shader.
@@ -113,9 +113,30 @@ shader.
 
 ### Raymarch (Low Quality)
 
+First, we calculate the xy screen-space coordinates from the 4D projective
+coordinates returned by the vertex shader, which becomes the uv value for
+the scene depth texture lookup. We also multiply a point on the view-space ray by
+unity_CameraToWorld so we can calculate the world-space direction of the
+raymarch.
 
+Next, we compute the raymarch offset. We already discussed varying the offset
+uniformly with time in a low-discrepancy manner. We will also wish to do so
+spatially, as well. We will offset the radius by a Bayer matrix applied over
+groups of 3x3 pixels, using concepts from
+[ordered dithering](https://en.wikipedia.org/wiki/Ordered_dithering).
+This is needed because we will add a step in Pass 1 that will look up
+raymarch values in a 3x3 neighbourhood, and we want to make sure we have a full
+distribution of offset fractions over that region, so all samples are not just
+from the same depth along the raymarch. Otherwise, neighbouring pixel results
+would be independent, and we could rely on the historical blending and uniform
+raymarch offset to handle proper depth sampling. By dividing the screen position
+by the texel size, we obtain a 2D pixel ID, which is used to determine the index
+within the repeating 3x3 Bayer matrix. This offset is added to the uniform
+raymarch offset, and brought back into the [0, 1] range.
 
-TODO
+Finally, we perform raymarching, returning the average depth value as a `float`,
+and the transmittance and intensity values as a `float4`, to the two targets
+of this pass.
 
 ### Blend Raymarch into History
 

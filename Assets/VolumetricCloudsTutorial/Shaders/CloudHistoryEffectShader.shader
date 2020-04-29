@@ -90,14 +90,14 @@
 			RaymarchResults FragRaymarch(InterpolatorsRaymarch i)
 			{
 				float2 screenPos = i.screenPos.xy / i.screenPos.w;
-				float2 uvDepth = UNITY_PROJ_COORD(screenPos);
+				float2 uvDepth = UNITY_PROJ_COORD(i.screenPos);
 
 				float3 viewPos = float3(i.viewRay, 1.0);
 				float4 worldPos = mul(unity_CameraToWorld, float4(viewPos, 1.0f));
 				worldPos /= worldPos.w;
 				float3 rayDirUnNorm = (worldPos.xyz - _WorldSpaceCameraPos);
 
-				int2 pixelId = int2(fmod(i.screenPos / _RaymarchedBuffer_TexelSize, 3));//Repeating 0,1,2 pattern in x and y
+				int2 pixelId = int2(fmod(screenPos / _RaymarchedBuffer_TexelSize, 3));//Repeating 0,1,2 pattern in x and y
 				float bayerOffset = _bayerOffsets[pixelId.x][pixelId.y] / 9.0;//Determines fractional offset from Bayer dithering matrix
 				float offset = -frac(_RaymarchOffset + bayerOffset);
 				float3 worldSpaceDirection;
