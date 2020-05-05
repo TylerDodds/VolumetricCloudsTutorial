@@ -103,6 +103,9 @@
 				float3 worldSpaceDirection;
 				float depthWeight;
 				float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(uvDepth, rayDirUnNorm, offset, _CameraDepthTexture, worldSpaceDirection, depthWeight);
+				float fadeFactor = (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceDirection.y));
+				transmittanceAndIntegratedIntensities.gba *= fadeFactor;
+				transmittanceAndIntegratedIntensities.r = 1 - (1 - transmittanceAndIntegratedIntensities.r) * fadeFactor;//Multiply opacity (1 - transmittance) by fadeFactor
 
 				RaymarchResults results;
 				results.Target0 = transmittanceAndIntegratedIntensities;
@@ -231,13 +234,20 @@
 			float4 FragLighting(InterpolatorsUvScreenViewPos i) : SV_Target
 			{
 				half4 sceneColor = tex2D(_MainTex, i.uv);
+				#if UNITY_COLORSPACE_GAMMA
+				sceneColor.rgb = GammaToLinearSpace(sceneColor.rgb);
+				sceneColor.a = GammaToLinearSpaceExact(sceneColor.a);
+				#endif
 
 				float4 cloudTransmittanceAndIntegratedIntensities = tex2D(_CloudDensityTexture, i.uv);
 				float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(cloudTransmittanceAndIntegratedIntensities, _AmbientBottom, _AmbientTop);
 
-				//TODO fade-out factor
-				//TODO gamma conversion
-				return raymarchColor + sceneColor * (1 - raymarchColor.a);//premultiplied alpha
+				float4 finalColor = raymarchColor + sceneColor * (1 - raymarchColor.a);//premultiplied alpha
+				#if UNITY_COLORSPACE_GAMMA
+				finalColor.rgb = LinearToGammaSpace(finalColor.rgb);
+				finalColor.a = LinearToGammaSpaceExact(finalColor.a);
+				#endif
+				return finalColor;
 			}
 
 			ENDCG

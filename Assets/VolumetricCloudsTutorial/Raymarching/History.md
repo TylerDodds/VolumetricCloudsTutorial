@@ -20,8 +20,6 @@ particularly check out the corresponding notes on the
 [implementation details](https://github.com/yangrc1234/VolumeCloud/blob/master/IMPLEMENTATIONDETAIL.md).
 This is the approach we will also follow.
 
-TODO
-
 ## Setup
 
 We will set up an ImageEffect in `CloudHistoryEffect.cs` containing multiple
@@ -136,7 +134,9 @@ raymarch offset, and brought back into the [0, 1] range.
 
 Finally, we perform raymarching, returning the average depth value as a `float`,
 and the transmittance and intensity values as a `float4`, to the two targets
-of this pass.
+of this pass. Note that we also handle here cases where there will be no
+raymarching, (an object in the way, or when the ray does not pass through the atmosphere)
+as well as the horizon angle fading discussed in [Raymarching](Raymarching.md).
 
 ### 1: Blend Raymarch into History
 
@@ -228,4 +228,9 @@ blending look more temporally consistent when the camera performs translations.
 
 ### 2: Apply Lighting, Blend with Scene
 
-TODO
+In this pass, we look up the scene color and recent history buffer's
+transmittance and intensity values. We then look up the raymarch color
+from these intensity values, and blend with the scene color based on the
+transmittance. Note that we also perform this blending in linear space,
+meaning we need to convert from and to Gamma space if that's the color space
+our project is using.
