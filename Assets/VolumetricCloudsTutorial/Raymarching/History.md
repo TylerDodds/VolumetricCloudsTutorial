@@ -111,7 +111,7 @@ shader.
 
 ## Passes
 
-### Raymarch (Low Quality)
+### 0: Raymarch (Moderate Quality)
 
 First, we calculate the xy screen-space coordinates from the 4D projective
 coordinates returned by the vertex shader, which becomes the uv value for
@@ -138,10 +138,94 @@ Finally, we perform raymarching, returning the average depth value as a `float`,
 and the transmittance and intensity values as a `float4`, to the two targets
 of this pass.
 
-### Blend Raymarch into History
+### 1: Blend Raymarch into History
 
-TODO
+#### Previous View Lookup
 
-### Apply Lighting, Blend with Scene
+We begin by looking up the two results from the previous pass using the
+screen-space uv values, and re-calculate the world-space raymarch direction.
+Then, using the average depth raymarch result, we calculate the corresponding
+3D world-space position as the representative point along the ray.
+
+Taking this world position
+to homogeneous coordinates, multiplying by the previous frame's view-projection
+matrix, taking the x-y non-homogeneous coordinates by dividing by w, we get the
+uv-space position of that point with respect to the previous frame's camera
+matrix. We use
+`GL.GetGPUProjectionMatrix(camera.projectionMatrix, false) * camera.worldToCameraMatrix)`
+to assign the view-projection matrix to the material in the correct format.
+
+With this uv, we can simply sample from the history buffer to look up the
+raymarch transmittance and intensity values from the previous frame along a
+roughly equivalent ray. Note that if the camera is only rotating, all rays from
+both frames will start at the same position, so this lookup is exact; different
+points along the current frame's ray will lie on the same ray with respect to the
+previous frame's camera. If the camera is moving, however, lookup up the
+previous frame's values from this approximate center of density is needed to
+ensure that the lookup is yielding correspondingly similar transmittance and
+intensity values.
+
+#### Blending
+
+The final step is to combine the previous frame's final result from the history
+buffer, with the current frame's Pass 0 raymarch results, producing the final
+sample for this frame that will be stored into the new history buffer.
+
+Let's first consider the case when the ray lookup uv was found within the
+[0,1]x[0,1] uv space of the history buffer. In this case, we perform a
+frame-by-frame interpolation:
+`lerp(history, raymarch, fraction)`, where we choose a small fraction around 0.05.
+Let's consider how this interpolation will look like with a sudden change in the
+base raymarch value, going from 1 (in the history buffer) to zero
+(in subsequent raymarch passes). At time t, in increments of &Delta;t per frame
+(around 1/60 of a second),
+R(t + &Delta;t) = R(t)(1-f) + 0*f, where R(0) = 1. So
+[R(t + &Delta;t) - R(t)]/&Delta;t = -fR(t)/&Delta;t.
+This is a simple differential equation: dR(t)/dt = -(f/&Delta;t)R(t), and the solution is
+an exponential: R(t) = A exp(-(f/&Delta;t) t), where in this case the constant A = 1 so
+that R(0) = 1, the initial value.
+In short, this means that new values will be blended to exponentially, with a
+half-life of ln(2) &Delta;t / f, around 0.23 s for the values discussed above.
+
+Now we consider when the ray lookup uv was found outside of [0,1]x[0,1]. We
+consider the maximum distance outside of the unit square along either x or y axis.
+If this value is larger than the blend fraction, we use it instead. In this way,
+we can weigh newly-uncovered pixels at the edges of the screen much more heavily
+with the current raymarch results, while still blending with the results of the
+history buffer. By using `TextureWrapMode.Clamp`, this lookup can at best
+clamp to the edge of the texture, but we can expect some amount of spatial
+coherence. In practice, this works well enough to handle camera rotation.
+
+#### Neighbourhood Lookup
+
+While lookup and blending alone may be enough to handle camera rotation, the
+case of camera translation may still end up with significantly different
+values between the previous frame's lookup and the current raymarch values.
+However, these will still be blended with the usual weight, and in these cases
+the half-life discussed above will be noticeable. This effect is most obvious
+at the edges of clouds.
+
+Just like we did for the case where the previous uv fell outside of the screen,
+we wish to weight values towards the current raymarch values more highly in
+these cases. To help determine if the previous and current raymarch values are
+significantly different, we'll also consider the values in the 3x3 neighbourhood
+of pixels of the current frame. If there is little spatial variance, but a
+significant difference from last frame, we'll want to trust the current frame's
+values more.
+
+From the values in this 3x3 area, we will determine the average and standard
+deviation for each of the four raymarch values: the transmittance and three
+intensities. We create a four-dimensional bounding box centered at the average
+of these values, with a width of 1.5 times the standard deviation. This box
+encapsulates roughly the expected spatial range of the values in the
+neighbourhood. Note that this 3x3  size is the same as our repeating
+Bayer matrix for the raymarch offset, so we can be sure that the depth is sampled
+appropriately within each neighbourhood.
+
+Before performing blending, we clamp the previous frame's looked-up value to the
+closest point on the bounding box, if it lies outside. This will make the
+blending look more temporally consistent when the camera performs translations.
+
+### 2: Apply Lighting, Blend with Scene
 
 TODO
