@@ -183,6 +183,18 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
             _camera.depthTextureMode |= DepthTextureMode.Depth;
         }
 
+        protected void SetKeyword(string keyword, bool enabled)
+        {
+            if (enabled)
+            {
+                _material.EnableKeyword(keyword);
+            }
+            else
+            {
+                _material.DisableKeyword(keyword);
+            }
+        }
+
         /// <summary>
         /// Abstract function to update the image effect's Material before rendering
         /// </summary>

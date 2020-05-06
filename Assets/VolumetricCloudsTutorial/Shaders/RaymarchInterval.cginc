@@ -3,7 +3,7 @@
 
 #include "CloudConstants.cginc"
 
-#if defined(QUALITY_HIGH)
+#if defined(QUALITY_HIGH)//TODO Parametrize these keywords
 #define TARGET_STEP_SIZE 50
 #define MIN_NUM_STEPS 256
 #define MAX_NUM_STEPS 256

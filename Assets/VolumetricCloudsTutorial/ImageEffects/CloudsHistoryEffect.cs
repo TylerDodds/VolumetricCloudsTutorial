@@ -8,23 +8,9 @@ namespace VolumetricCloudsTutorial.ImageEffects
     /// </summary>
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
-    public class CloudsHistoryEffect : Base.ImageEffectBase
+    public class CloudsHistoryEffect : Base.CloudEffectBase
     {
         [SerializeField] [Range(0, 2)] private int _downsample;
-
-        [SerializeField] private CloudConfiguration _cloudConfiguration;
-
-        /// <summary>
-        /// Update the image effect's Material before rendering
-        /// </summary>
-        /// <param name="material">The Material to update</param>
-        protected override void UpdateMaterial(Material material)
-        {
-            if (_cloudConfiguration != null)
-            {
-                _cloudConfiguration.SetMaterialProperties(material);
-            }
-        }
 
         /// <summary>
         /// Perform the image effect during <see cref="OnRenderImage(RenderTexture, RenderTexture)"/>

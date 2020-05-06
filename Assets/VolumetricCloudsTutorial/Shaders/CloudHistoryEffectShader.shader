@@ -54,6 +54,7 @@
 			#pragma fragment FragRaymarch
 			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW
 			#pragma shader_feature UNPACK_CURL
+			#pragma multi_compile _ ADAPTIVE_STEPS
 
 			float _RaymarchOffset; //Fractional offset along first step; changes every frame to avoid biased sampling
 			float2 _RaymarchedBuffer_TexelSize;	//Texel size of final buffer used to detemine neighbour offset from Bayer Matrix

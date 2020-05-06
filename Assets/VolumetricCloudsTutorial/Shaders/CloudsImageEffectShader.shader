@@ -56,6 +56,7 @@
 			#pragma fragment frag
 			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW
 			#pragma shader_feature UNPACK_CURL
+			#pragma multi_compile _ ADAPTIVE_STEPS
 			ENDCG
 		}
 	}

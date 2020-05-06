@@ -111,6 +111,8 @@ shader.
 
 ### 0: Raymarch (Moderate Quality)
 
+TODO - discuss downsampling
+
 First, we calculate the xy screen-space coordinates from the 4D projective
 coordinates returned by the vertex shader, which becomes the uv value for
 the scene depth texture lookup. We also multiply a point on the view-space ray by
