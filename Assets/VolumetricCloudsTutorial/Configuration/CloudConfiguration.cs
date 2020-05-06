@@ -167,7 +167,7 @@ namespace VolumetricCloudsTutorial.Configuration
             material.SetTexture("_DetailDensityNoise", DetailDensityNoisePacked);
             material.SetTexture("_WeatherTex", WeatherTexture);
             material.SetTexture("_DensityErosionTex", DensityErosionTexture);
-            material.SetTexture("_CurlTex", CurlNoise);//TODO set keyword for packing?
+            material.SetTexture("_CurlTex", CurlNoise);
             if(CurlNoise != null && (CurlNoise.format == TextureFormat.RGB24 || CurlNoise.format == TextureFormat.RGBA32))
             {
                 material.EnableKeyword(_unpackCurlKeyword);
