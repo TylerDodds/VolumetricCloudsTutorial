@@ -11,6 +11,11 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
     public abstract class CloudEffectBase : ImageEffectBase
     {
         /// <summary>
+        /// The quality of the raymarch step size.
+        /// </summary>
+        [SerializeField] private RaymarchStepQuality _raymarchStepQuality = RaymarchStepQuality.Normal;
+
+        /// <summary>
         /// If adaptive step size raymarching should be used.
         /// </summary>
         [SerializeField] private bool _adaptiveStepSize = false;
@@ -27,10 +32,19 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         protected override void UpdateMaterial(Material material)
         {
             SetKeyword("ADAPTIVE_STEPS", _adaptiveStepSize);
+            SetKeyword("QUALITY_LOW", _raymarchStepQuality == RaymarchStepQuality.Low);
+            SetKeyword("QUALITY_HIGH", _raymarchStepQuality == RaymarchStepQuality.High);
             if (_cloudConfiguration != null)
             {
                 _cloudConfiguration.SetMaterialProperties(material);
             }
+        }
+
+        private enum RaymarchStepQuality
+        {
+            Low,
+            Normal,
+            High
         }
     }
 }
