@@ -3,7 +3,7 @@
 
 #include "CloudConstants.cginc"
 
-#if defined(QUALITY_HIGH)//TODO Parametrize these keywords
+#if defined(QUALITY_HIGH)//TODO finalize these number
 #define TARGET_STEP_SIZE 50
 #define MIN_NUM_STEPS 256
 #define MAX_NUM_STEPS 256
@@ -16,6 +16,11 @@
 #define MIN_NUM_STEPS 64
 #define MAX_NUM_STEPS 64
 #endif
+
+//TODO parametrize step factors, based on quality?
+#define ADAPTIVE_FRACTION_DENSITY_INCREASING 3
+#define ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM 4
+#define ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC 5
 
 
 /// Gets the number of steps based on TARGET_STEP_SIZE,
