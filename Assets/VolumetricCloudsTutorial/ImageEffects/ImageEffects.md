@@ -154,3 +154,13 @@ and set the Material's `_MainTex` property as the source RenderTexture.
 We then call our two abstract functions: `UpdateMaterial` and `PerformEffect`.
 Respectively, these update the rest of the Material's properties, and perform
 the full-screen effect (using the techniques described above).
+
+## `CloudEffectBase.cs`
+
+This MonoBehaviour inherits from `ImageEffectBase`, and holds a reference to
+a `CloudConfiguration` instance, holding all of the visual parameters relevant
+for cloud rendering.
+
+It also serialized the raymarch quality (Low, Normal, or High),
+determining the step size of the raymarching, as well as if adaptive raymarch
+step size is being used (see [Raymarching](../Raymarching/Raymarching.md)).
