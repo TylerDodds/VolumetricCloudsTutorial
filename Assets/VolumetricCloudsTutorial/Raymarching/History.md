@@ -107,11 +107,29 @@ GetProjectionExtents decribed in [ImageEffects](../ImageEffects/ImageEffects.md)
 Pass 0 does not need the uv values, so they are not forwarded to its fragment
 shader.
 
+### Downscaling
+
+We set up two buffers to hold the results of Pass 0, and two history buffers
+to hold the input and ouput of Pass 1. In the highest-quality scenario, we will
+create these all with the height and width of the screen, so that each pixel
+of the final image will map in a 1-to-1 fashion to a pixel from the current
+history buffer. In turn, the blending in Pass 1 will map 1-to-1 to the raymarch
+results in Pass 0.
+
+However, we may instead downscale _all_ of these textures to half or quarter
+size, significantly reducing the number of pixels we need to perform raymarching
+on in Pass 0, and also reducing the number of pixels used for blending in Pass 1.
+The final pass will write to the screen, looking up from the lower-resolution
+history buffer using bilinear interpolation.
+
+In practice, at larger screen resolutions and  for many sets of cloud
+configuration parameters, using half-resolution buffers is not noticeably
+visually different from full-resolution ones, and saves a significant amount
+of execution time.
+
 ## Passes
 
 ### 0: Raymarch (Moderate Quality)
-
-TODO - discuss downsampling
 
 First, we calculate the xy screen-space coordinates from the 4D projective
 coordinates returned by the vertex shader, which becomes the uv value for

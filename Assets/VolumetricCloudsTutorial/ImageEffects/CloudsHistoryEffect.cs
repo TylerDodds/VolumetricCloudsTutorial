@@ -10,7 +10,7 @@ namespace VolumetricCloudsTutorial.ImageEffects
     [RequireComponent(typeof(Camera))]
     public class CloudsHistoryEffect : Base.CloudEffectBase
     {
-        [SerializeField] [Range(0, 2)] private int _downsample;
+        [SerializeField] [Range(0, 2)] private int _downscaling;
 
         /// <summary>
         /// Perform the image effect during <see cref="OnRenderImage(RenderTexture, RenderTexture)"/>
@@ -21,8 +21,8 @@ namespace VolumetricCloudsTutorial.ImageEffects
         /// <param name="destination">The destination RenderTexture</param>
         protected override void PerformEffect(Material material, Camera camera, RenderTexture source, RenderTexture destination)
         {
-            int width = source.width >> _downsample;
-            int height = source.height >> _downsample;
+            int width = source.width >> _downscaling;
+            int height = source.height >> _downscaling;
 
             if (_historyDoubleBuffers == null)
             {
