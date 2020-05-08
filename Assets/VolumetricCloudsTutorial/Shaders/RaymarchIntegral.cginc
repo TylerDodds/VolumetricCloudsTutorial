@@ -29,7 +29,7 @@ float2 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float s
 	{
 		int stepFactor = baseDensities.z < baseDensities.y ? (baseDensities.y < baseDensities.x ? ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC : ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM) : ADAPTIVE_FRACTION_DENSITY_INCREASING;
 		//TODO increase offstep fraction beyond a single base step size?
-		finalOffset = nextOffset + stepFactor * stepSizeBase;
+		finalOffset = offsets.z + stepFactor * stepSizeBase;
 		UPDATE_POS_DEN
 		if (baseDensity > 0)
 		{
