@@ -393,9 +393,59 @@ direction as discussed in raymarching [setup](#setup). Given the known distance,
 we can determine a uniform step size. However, we may also choose to take
 larger steps in cases where the density is smaller, the transmittance is
 close to 1 through this portion, and the scattered light intensity is low,
-so we can afford more approximate calculations.
+so we can afford more approximate calculations. This ties in with the discussion
+in [History](History.md), where a raymarch offset distributed frame-by-frame
+along a single step ensures equal coverage over time of the whole ray.
 
-TODO
+There are many possible approaches to adaptively change the step size. Most
+approaches will simply try to skip as much empty space as possible. Although
+we do not perform detailed density and lighting calculations when the density is
+zero, if we can skip sampling empty space, we can gain significant performance
+improvements with negligible or no change to the final result.
+
+We could try to pre-process weather or density textures in areas of zero cloud
+density, and determine a safe raymarch step distance. This style of approach is
+taken by yangrc1234's
+[VolumeCloud](https://github.com/yangrc1234/VolumeCloud/blob/master/IMPLEMENTATIONDETAIL.md)
+repository. This stores a hierarchical representation of the maximum height of
+cloud density, starting at the weather texture resolution. Then, at each point,
+the existence of the cloud can be sampled cheaply, and larger region of no
+density can be easily encapsulated at lower resolutions of the representation
+pyramid. If the chosen weather cloud coverage will be sparse, this approach
+would certainly be worth the time investment.
+
+We could increase step size while cloud density is zero. This is the approach
+taken by the [Nubis system](https://www.guerrilla-games.com/read/nubis-authoring-real-time-volumetric-cloudscapes-with-the-decima-engine),
+where step size is doubled after density has been zero for several frames.
+When non-zero density is found, we backtrack and take regular-sized steps.
+An approach like this is comparatively simple and mostly agnostic to the
+particulars of the clouds we're trying to render.
+
+We'll take a similar approach to this, but we'll try to take advantage of the
+fact that we can much of our density parametrization means the base density,
+before clamping, can actually be negative. Therefore, in regions with zero
+density, we can observe the behavior of the clamped base density over the last
+few steps, and set the step size accordingly.
+We'll start by looking at the last three steps, and if any had a positive density,
+we continue at the base step size.
+Otherwise, we look at the change in density. If it continually has gotten more
+negative, we may take the liberty of taking a fairly large step size, perhaps
+several times that of the base size. If density has increased since the last
+step, then we will take a relatively smaller step. Otherwise, we may take a step
+somewhere in between.
+
+With additional care, we may try to model the local behavior of the density function,
+and skip closer to where the function is estimated to hit zero. However, since
+the coverage and density consist of fairly complicated noise functions,
+this approach is difficult to implement in a correct and useful fashion,
+so we will not pursue it.
+
+Note that we may parametrize these step sizes based on the
+base step size; if it is smaller, we can take vary large multiples of that step
+size without worrying that we will completely skip over any regions of positive
+density.
+With some fine tuning, we can save around a factor of two in execution time,
+with no perceptible visual changes.
 
 ### RaymarchTransmittanceAndIntegratedIntensityAndDepth
 
