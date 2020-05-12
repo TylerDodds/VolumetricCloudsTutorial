@@ -22,7 +22,7 @@ static const float earthRadius = 200000;//6371000 is the correct value, though s
 static const float3 earthCenter = float3(0, -earthRadius, 0);
 
 /// Effective 'far' depth to use for return depth of clouds in directions where you see no clouds
-static const float _farDepth = 1e6;//TODO parameterize this?
+static const float _farDepth = 1e6;
 
 /// Maximum value of detail density to remap to zero
 static const float _maxDetailRemapping = 0.8;

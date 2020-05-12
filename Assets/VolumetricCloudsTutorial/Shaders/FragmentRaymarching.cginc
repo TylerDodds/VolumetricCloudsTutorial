@@ -13,6 +13,10 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, fl
 {
 	float3 startPos = _WorldSpaceCameraPos + ray;
 	worldSpaceDirection = normalize(ray);
+
+	#define SET_FAR_DEPTH depthWeighted = _farDepth;return float4(1, 0, 0, 0);
+	//TODO improved handling of _fadeHorizonAngle//TODO use Linear01Depth as raymarch stopping criterion instead
+
 	// Reconstruct world space position & direction towards this screen pixel.
 	float zsample = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv_depth);
 	#if UNITY_REVERSED_Z
@@ -21,9 +25,7 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, fl
 	if (zsample < 1)
 	#endif
 	{
-		depthWeighted = _farDepth;
-		return float4(1, 0, 0, 0);//TODO improved handling of _fadeHorizonAngle
-		//TODO use Linear01Depth as raymarch stopping criterion instead
+		SET_FAR_DEPTH
 	}
 	
 	float depth = Linear01Depth(zsample * (zsample < 1.0));
@@ -33,14 +35,12 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, fl
 
 	if (worldSpaceDirection.y < -fadeHorizonAngle)
 	{
-		depthWeighted = _farDepth;
-		return float4(1, 0, 0, 0);//TODO improved handling of _fadeHorizonAngle
+		SET_FAR_DEPTH
 	}
 
 	if (!GetCloudRaymarchInterval_EarthCurvature(_WorldSpaceCameraPos, worldSpaceDirection, raymarchStart, raymarchDistance, cloudHeightDistance))
 	{
-		depthWeighted = _farDepth;
-		return float4(1, 0, 0, 0);//TODO improved handling of _fadeHorizonAngle
+		SET_FAR_DEPTH
 	}
 
 	float4 transmittanceAndIntensities = RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(raymarchStart, worldSpaceDirection, raymarchDistance, startPos, offset, depthWeighted);
