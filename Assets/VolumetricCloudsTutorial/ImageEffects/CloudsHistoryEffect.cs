@@ -10,7 +10,7 @@ namespace VolumetricCloudsTutorial.ImageEffects
     [RequireComponent(typeof(Camera))]
     public class CloudsHistoryEffect : Base.CloudEffectBase
     {
-        [SerializeField] [Range(0, 2)] private int _downscaling;
+        [SerializeField] [Range(0, 2)] private int _downscaling = 0;
 
         [SerializeField] [Range(0.01f, 1)] private float _blendHalfLife = 0.23f;
 
