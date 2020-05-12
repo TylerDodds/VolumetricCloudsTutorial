@@ -12,6 +12,8 @@ namespace VolumetricCloudsTutorial.ImageEffects
     {
         [SerializeField] [Range(0, 2)] private int _downscaling;
 
+        [SerializeField] [Range(0.01f, 1)] private float _blendHalfLife = 0.23f;
+
         /// <summary>
         /// Perform the image effect during <see cref="OnRenderImage(RenderTexture, RenderTexture)"/>
         /// </summary>
@@ -61,6 +63,7 @@ namespace VolumetricCloudsTutorial.ImageEffects
             material.SetTexture("_RaymarchedBuffer", _raymarchedBuffer);
             material.SetTexture("_RaymarchedAvgDepthBuffer", _raymarchAvgDepthBuffer);
             material.SetMatrix("_PrevVP", GL.GetGPUProjectionMatrix(camera.projectionMatrix, false) * _previousViewMatrix);
+            material.SetFloat("_Ln2OverBlendHalfLife", Mathf.Log(2) / _blendHalfLife);
 
             int historyOtherIndex = (_historyIndex + 1) % 2;
             Graphics.Blit(_historyDoubleBuffers[_historyIndex], _historyDoubleBuffers[historyOtherIndex], material, 1);

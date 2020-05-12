@@ -129,6 +129,7 @@
 			uniform sampler2D _RaymarchedAvgDepthBuffer;
 			uniform float4 _RaymarchedBuffer_TexelSize;
 			uniform float4x4 _PrevVP;
+			uniform float _Ln2OverBlendHalfLife = 3;
 
 			//Gets the uv of the world position with respect to the previous view-projection matrix.
 			//Also return how far (in unit square coordinates) the uv is outside of the unit square.
@@ -211,7 +212,7 @@
 				//If sample is too far in value from thosea round in, clip it to a bounding box based on average and standard deviation.
 
 				//Determine how far out of bounds, and blend accordingly.
-				const float historyMinUpdateFraction = 0.05;//TODO Parametrize
+				const float historyMinUpdateFraction = unity_DeltaTime.x * _Ln2OverBlendHalfLife;
 				float4 blendedSample = lerp(prevSample, raymarchResult, max(historyMinUpdateFraction, step(0, outOfProjectionBB)));//TODO Better blending?
 
 				return blendedSample;
