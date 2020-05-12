@@ -205,7 +205,9 @@ This is a simple differential equation: dR(t)/dt = -(f/&Delta;t)R(t), and the so
 an exponential: R(t) = A exp(-(f/&Delta;t) t), where in this case the constant A = 1 so
 that R(0) = 1, the initial value.
 In short, this means that new values will be blended to exponentially, with a
-half-life of ln(2) &Delta;t / f, around 0.23 s for the values discussed above.
+half-life of T<sub>H</sub> = ln(2) &Delta;t / f, around 0.23 s for the values
+discussed above. Alternatively, f = ln(2) &Delta;t / T<sub>H</sub>, and we
+can parametrize T<sub>H</sub> directly.
 
 Now we consider when the ray lookup uv was found outside of [0,1]x[0,1]. We
 consider the maximum distance outside of the unit square along either x or y axis.
