@@ -23,7 +23,9 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         /// <summary>
         /// The <see cref="CloudConfiguration"/> reference containing cloud rendering parameters.
         /// </summary>
+        #pragma warning disable 0649
         [SerializeField] private CloudConfiguration _cloudConfiguration;
+        #pragma warning restore 0649
 
         /// <summary>
         /// Update the image effect's Material before rendering

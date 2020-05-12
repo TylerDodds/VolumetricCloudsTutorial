@@ -239,7 +239,9 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         /// <summary>
         /// Shader for the image effect, to be serialized and set in the Inspector
         /// </summary>
+        #pragma warning disable 0649
         [SerializeField] Shader _shader;
+        #pragma warning restore 0649
 
         /// <summary>
         /// The Material instantiated from <see cref="_shader"/>
