@@ -6,7 +6,7 @@
 #include "CloudLighting.cginc"
 
 static const float _opaqueCutoff = 0.005;
-static const float _wetIntensityFraction = 0.3;//TODO parametrize
+uniform float _WetIntensityFraction = 0.3;
 uniform float _SigmaScattering = 0.1;
 
 /// Updates the final offset and gets the next density from GetBaseDensity.
@@ -88,7 +88,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 				const float transmittance = exp(-extinction * stepSizeBase);
 
 				float isotropicScatteringRate;
-				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, baseDensityCurrent, stepSizeBase, isotropicScatteringRate) * lerp(1.0, _wetIntensityFraction, wetness);
+				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, baseDensityCurrent, stepSizeBase, isotropicScatteringRate) * lerp(1.0, _WetIntensityFraction, wetness);
 				float2 scatteredAmbientIntensities = scattering * GetAmbientIntensityTopBottom(heightFraction, _SigmaExtinction) * isotropicScatteringRate;
 
 				float integratedIntensity = (scatteredIntensity - scatteredIntensity * transmittance) / clampedExtinction;

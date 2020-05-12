@@ -159,6 +159,8 @@ namespace VolumetricCloudsTutorial.Configuration
         [SerializeField] [ColorUsage(false, true)] Color _ambientTop = new Color(.25f, .25f, .15f);
         public Color AmbientTop { get { return _ambientTop; } }
 
+        [SerializeField] [Range(0, 1)] float _wetIntensityFraction = 0.3f;
+        public float WetIntensityFraction { get { return _wetIntensityFraction; } }
 
         /// <summary> Sets cloud shader properties for the given material based on the configuration values. </summary>
         public void SetMaterialProperties(Material material)
@@ -200,6 +202,7 @@ namespace VolumetricCloudsTutorial.Configuration
 
             material.SetFloat("_EccentricityForwards", EccentricityForwards);
             material.SetFloat("_EccentricityBackwards", EccentricityBackwards);
+            material.SetFloat("_WetIntensityFraction", WetIntensityFraction);
             material.SetVector("_MultiScatteringFactors_Extinction_Eccentricity_Intensity", new Vector4(MultiScatteringExtinctionFactor, MultiScatteringEccentricityFactor, MultiScatteringIntensityFactor, 0));
             material.SetVector("_HeightScattering_Low_High_Min_Power", new Vector4(HeightScatteringLowFraction, HeightScatteringHighFraction, HeightScatteringMinProbability, HeightScatteringPower));
             material.SetVector("_DepthScattering_Low_High_Min_Max", new Vector4(DepthScatteringLowFraction, DepthScatteringHighFraction, DepthScatteringMinPower, DepthScatteringMaxPower));
