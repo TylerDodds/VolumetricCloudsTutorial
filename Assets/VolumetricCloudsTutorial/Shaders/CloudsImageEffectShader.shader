@@ -11,6 +11,7 @@
 	#include "FragmentRaymarching.cginc"
 	#include "RaymarchColor.cginc"
 	#include "NoiseTextureUtil.cginc"
+	#include "DepthSampling.cginc"
 
 	sampler2D_float _CameraDepthTexture;
 	uniform float4 _AmbientBottom;
@@ -29,7 +30,8 @@
 		float3 worldSpaceDirection;
 		const float offset = 0;
 		float depthWeight;
-		float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(i.uv_depth, i.ray, offset, _CameraDepthTexture, worldSpaceDirection, depthWeight);
+		float linear01Depth = SampleLinear01Depth(_CameraDepthTexture, i.uv_depth);
+		float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(linear01Depth, i.ray, offset, worldSpaceDirection, depthWeight);
 
 		float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(transmittanceAndIntegratedIntensities, _AmbientBottom, _AmbientTop);
 

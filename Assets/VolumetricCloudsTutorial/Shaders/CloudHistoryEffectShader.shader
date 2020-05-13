@@ -11,6 +11,7 @@
 	#include "FragmentRaymarching.cginc"
 	#include "RaymarchColor.cginc"
 	#include "NoiseTextureUtil.cginc"
+	#include "DepthSampling.cginc"
 
 	sampler2D_float _CameraDepthTexture;
 	float4 _ProjectionExtents; //For computing view-space ray
@@ -55,6 +56,7 @@
 			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW
 			#pragma shader_feature UNPACK_CURL
 			#pragma multi_compile _ ADAPTIVE_STEPS
+			#pragma multi_compile _ DOWNSAMPLE_1 DOWNSAMPLE_2
 
 			float _RaymarchOffset; //Fractional offset along first step; changes every frame to avoid biased sampling
 			float2 _RaymarchedBuffer_TexelSize;	//Texel size of final buffer used to detemine neighbour offset from Bayer Matrix
@@ -103,7 +105,8 @@
 				float offset = -frac(_RaymarchOffset + bayerOffset);
 				float3 worldSpaceDirection;
 				float depthWeight;
-				float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(uvDepth, rayDirUnNorm, offset, _CameraDepthTexture, worldSpaceDirection, depthWeight);
+				float farLinear01Depth = GetFarLinear01Depth(_CameraDepthTexture, uvDepth, _RaymarchedBuffer_TexelSize);
+				float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(farLinear01Depth, rayDirUnNorm, offset, worldSpaceDirection, depthWeight);
 				float fadeFactor = (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceDirection.y));
 				transmittanceAndIntegratedIntensities.gba *= fadeFactor;
 				transmittanceAndIntegratedIntensities.r = 1 - (1 - transmittanceAndIntegratedIntensities.r) * fadeFactor;//Multiply opacity (1 - transmittance) by fadeFactor
