@@ -49,11 +49,14 @@ namespace VolumetricCloudsTutorial.ImageEffects
             RenderTargetSetup raymarchRenderTargetSetup = new RenderTargetSetup(_raymarchColorBuffers, _raymarchedBuffer.depthBuffer);
 
             //Pass 0 into raymarched buffer, with regular sampling quality.
+            SetKeyword("DOWNSAMPLE_1", _downscaling == 1);
+            SetKeyword("DOWNSAMPLE_2", _downscaling == 2);
             material.SetVector("_ProjectionExtents", GetProjectionExtents(camera));
             material.SetFloat("_RaymarchOffset", _lowDiscrepancySequence.GetNextValue());
             material.SetVector("_RaymarchedBuffer_TexelSize", _raymarchedBuffer.texelSize);
             BlitMRT(raymarchRenderTargetSetup, false, material, 0);
 
+            //TODO ensure depth blending is correct around edges of objects! Particularly from downsampling, MSAA, and ClipToAABB
             //Pass 1: blending into active history buffer
             if (_isFirstFrame)
             {

@@ -9,7 +9,7 @@
 /// From pixel shader fragment information, reconstruct scene depth and view ray position for raymarching. 
 /// Get raymarch interval based on earth's size, and perform raymarching.
 /// Returns transmittance, sun intensity fraction, ambient intensity fraction
-float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, float3 ray, float offset, sampler2D _CameraDepthTexture, out float3 worldSpaceDirection, out float depthWeighted)
+float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float linear01Depth, float3 ray, float offset, out float3 worldSpaceDirection, out float depthWeighted)
 {
 	float3 startPos = _WorldSpaceCameraPos + ray;
 	worldSpaceDirection = normalize(ray);
@@ -18,17 +18,11 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float2 uv_depth, fl
 	//TODO improved handling of _fadeHorizonAngle//TODO use Linear01Depth as raymarch stopping criterion instead
 
 	// Reconstruct world space position & direction towards this screen pixel.
-	float zsample = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv_depth);
-	#if UNITY_REVERSED_Z
-	if (zsample > 0)
-	#else
-	if (zsample < 1)
-	#endif
+	if (linear01Depth < 1)
 	{
 		SET_FAR_DEPTH
 	}
-	
-	float depth = Linear01Depth(zsample * (zsample < 1.0));
+	//TODO Handle cases of depth lookup when downsampling
 
 	float3 raymarchStart;
 	float raymarchDistance, cloudHeightDistance;
