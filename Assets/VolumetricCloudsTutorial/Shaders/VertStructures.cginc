@@ -5,31 +5,30 @@
 
 sampler2D _MainTex;
 float4 _MainTex_TexelSize;
+float4 _ProjectionExtents;
 
-/// Vertex structure for image effects, including main texture UV, depth UV, and camera view ray (packed into normals of the input).
-struct v2f
+struct VertData
 {
-	float4 pos : SV_POSITION;
+	float4 vertex : POSITION;
 	float2 uv : TEXCOORD0;
-	float2 uv_depth : TEXCOORD1;
-	float3 ray : TEXCOORD2;
 };
 
-/// Vertex program to load the main texture UV, depth UV, and camera view ray (packed into normals of the input).
-v2f vert(appdata_full v)
+struct InterpolatorsUvScreenViewPos
 {
-	v2f o;
+	float4 vertex : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float4 screenPos : TEXCOORD1;
+	float2 viewRay : TEXCOORD2;
+};
 
-	o.pos = UnityObjectToClipPos(v.vertex);
-	o.uv = v.texcoord.xy;
-	o.uv_depth = v.texcoord.xy;
-	o.ray = v.texcoord1.xyz;
-
-	//See https://docs.unity3d.com/Manual/SL-PlatformDifferences.html
-	#if UNITY_UV_STARTS_AT_TOP
-	if (_MainTex_TexelSize.y < 0.0) o.uv.y = 1.0 - o.uv.y;
-	#endif
-
+InterpolatorsUvScreenViewPos VertUvScreenViewPos(VertData v)
+{
+	InterpolatorsUvScreenViewPos o;
+	o.vertex = UnityObjectToClipPos(v.vertex);
+	o.uv = v.uv;
+	//Convert screen uv to [-1, 1]x[-1, 1] range, then multiplying by projection extents get the xy components of the view-space ray at depth 1.
+	o.viewRay = (2.0 * v.uv - 1.0) * _ProjectionExtents.xy + _ProjectionExtents.zw;
+	o.screenPos = ComputeScreenPos(o.vertex);
 	return o;
 }
 

@@ -123,56 +123,6 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
             GL.PopMatrix();
         }
 
-        /// <summary>
-        /// Draws a full-screen quad to the destination RenderTexture using <see cref="GL"/> commands.
-        /// </summary>
-        /// <param name="camera">The Camera</param>
-        /// <param name="destination">The desination RenderTxture</param>
-        protected static void DrawFullScreenQuad(Camera camera, RenderTexture destination)
-        {
-            // Calculate vectors towards frustum corners.
-            var camtr = camera.transform;
-            var camNear = camera.nearClipPlane;
-            var camFar = camera.farClipPlane;
-
-            var tanHalfFov = Mathf.Tan(camera.fieldOfView * Mathf.Deg2Rad / 2);
-            var toRight = camtr.right * camNear * tanHalfFov * camera.aspect;
-            var toTop = camtr.up * camNear * tanHalfFov;
-
-            var v_tl = camtr.forward * camNear - toRight + toTop;
-            var v_tr = camtr.forward * camNear + toRight + toTop;
-            var v_br = camtr.forward * camNear + toRight - toTop;
-            var v_bl = camtr.forward * camNear - toRight - toTop;
-
-            var v_s = v_tl.magnitude * camFar / camNear;
-
-            // Draw screen quad.
-            RenderTexture.active = destination;
-
-            GL.PushMatrix();
-            GL.LoadOrtho();
-            GL.Begin(GL.QUADS);
-
-            GL.MultiTexCoord2(0, 0, 0);
-            GL.MultiTexCoord(1, v_bl.normalized * v_s);
-            GL.Vertex3(0, 0, 0.1f);
-
-            GL.MultiTexCoord2(0, 1, 0);
-            GL.MultiTexCoord(1, v_br.normalized * v_s);
-            GL.Vertex3(1, 0, 0.1f);
-
-            GL.MultiTexCoord2(0, 1, 1);
-            GL.MultiTexCoord(1, v_tr.normalized * v_s);
-            GL.Vertex3(1, 1, 0.1f);
-
-            GL.MultiTexCoord2(0, 0, 1);
-            GL.MultiTexCoord(1, v_tl.normalized * v_s);
-            GL.Vertex3(0, 1, 0.1f);
-
-            GL.End();
-            GL.PopMatrix();
-        }
-
         protected virtual void Awake()
         {
             _camera = GetComponent<Camera>();

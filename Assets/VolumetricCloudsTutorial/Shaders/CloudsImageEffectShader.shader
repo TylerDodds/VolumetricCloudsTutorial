@@ -19,7 +19,7 @@
 
 	/// Perform raymarching in the view direction to determine transmittance and intensity, 
 	/// then find final pixel color.
-	half4 frag(v2f i) : SV_Target
+	half4 frag(InterpolatorsUvScreenViewPos i) : SV_Target
 	{
 		half4 sceneColor = tex2D(_MainTex, i.uv);
 		#if UNITY_COLORSPACE_GAMMA
@@ -27,11 +27,17 @@
 		sceneColor.a = GammaToLinearSpaceExact(sceneColor.a);
 		#endif
 
+		float3 viewPos = float3(i.viewRay, 1.0);
+		float4 worldPos = mul(unity_CameraToWorld, float4(viewPos, 1.0f));
+		worldPos /= worldPos.w;
+		float3 rayDirUnNorm = (worldPos.xyz - _WorldSpaceCameraPos);
+
 		float3 worldSpaceDirection;
 		const float offset = 0;
 		float depthWeight;
-		float linear01Depth = SampleLinear01Depth(_CameraDepthTexture, i.uv_depth);
-		float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(linear01Depth, i.ray, offset, worldSpaceDirection, depthWeight);
+		float2 uvDepth = UNITY_PROJ_COORD(i.screenPos);
+		float linear01Depth = SampleLinear01Depth(_CameraDepthTexture, uvDepth);
+		float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(linear01Depth, rayDirUnNorm, offset, worldSpaceDirection, depthWeight);
 
 		float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(transmittanceAndIntegratedIntensities, _AmbientBottom, _AmbientTop);
 
@@ -54,7 +60,7 @@
 		Pass
 		{
 			CGPROGRAM
-			#pragma vertex vert
+			#pragma vertex VertUvScreenViewPos
 			#pragma fragment frag
 			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW
 			#pragma shader_feature UNPACK_CURL
