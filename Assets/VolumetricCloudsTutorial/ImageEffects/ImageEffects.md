@@ -61,7 +61,10 @@ destination parameters).
 However, using `GL.Begin`, we can set the normal vectors of the four vertices of
 the quadrilateral to be the view vectors of the four corners of the frustum.
 These will be interpolated in the shader, so we can easily reconstruct the view
-ray from the camera at any point sampled.
+ray from the camera at any point sampled. We note that this method may run into
+issues when MSAA is turned off, so we'll continue in favour of `Graphics.Blit`.
+We'll use our `GetProjectionExtents` function results instead to determine the
+view-space fragment position, and thereby a world-space direction vector.
 
 ### Class Overview
 
@@ -123,12 +126,6 @@ reconstruct the view direction vector of the sample.
 For some calculations, we may wish to add some jitter in x and y to the sampled
 position, but we will concern ourselves with the case
 `texelOffsetX = texelOffsetY = 0`.
-
-#### `DrawFullScreenQuad(Camera camera, RenderTexture destination)`
-
-As discussed above, uses `Gl.Begin` and related functions to drawn a full-screen
-quadrilateral from two triangles, storing the frustum corner direction vectors
-in the texture coordinate normals.
 
 #### `[SerializeField] Shader _shader`
 Shader for the image effect, to be serialized and set in the Inspector.

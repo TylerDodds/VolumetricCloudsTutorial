@@ -19,8 +19,8 @@ namespace VolumetricCloudsTutorial.ImageEffects
         /// <param name="destination">The destination RenderTexture</param>
         protected override void PerformEffect(Material material, Camera camera, RenderTexture source, RenderTexture destination)
         {
-            material.SetPass(0);
-            DrawFullScreenQuad(camera, destination);
+            material.SetVector("_ProjectionExtents", GetProjectionExtents(camera));
+            Graphics.Blit(source, destination, material, 0);
         }
 
     }
