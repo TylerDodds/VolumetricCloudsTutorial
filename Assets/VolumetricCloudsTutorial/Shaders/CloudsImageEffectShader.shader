@@ -49,7 +49,7 @@
 		finalColor.rgb = LinearToGammaSpace(finalColor.rgb);
 		finalColor.a = LinearToGammaSpaceExact(finalColor.a);
 		#endif
-		return finalColor;
+		return linear01Depth == 1 ? finalColor : sceneColor;
 		//TODO Handle clouds in front of transparent objects? do clouds first then skybox 'underneath' with its own separate blending?
 	}
 
