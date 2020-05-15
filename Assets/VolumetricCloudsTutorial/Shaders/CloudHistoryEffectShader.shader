@@ -226,7 +226,10 @@
 				finalColor.rgb = LinearToGammaSpace(finalColor.rgb);
 				finalColor.a = LinearToGammaSpaceExact(finalColor.a);
 				#endif
-				return finalColor;
+
+				float2 uvDepth = UNITY_PROJ_COORD(i.screenPos);
+				float linear01Depth = SampleLinear01Depth(_CameraDepthTexture, uvDepth);
+				return linear01Depth == 1 ? finalColor : sceneColor;
 			}
 
 			ENDCG
