@@ -36,43 +36,58 @@ fraction to update the intensity.
 
 ### From Fragment Shader (`FragmentRaymarching.cginc`)
 
-#### `FragmentTransmittanceAndIntegratedIntensityAndDepth`
+#### `FragmentTransmittanceAndIntegratedIntensitiesAndDepth`
 
 Input Parameters:
 
-* `float2 uv_depth`: uv for performing depth texture lookup
+* `float linear01Depth`: lookup of scene depth converted to 0-1 fraction
 * `float3 ray`: world-space view ray of the pixel (not normalized)
 * `float offset`: raymarch position offset along the ray
-* `sampler2D _CameraDepthTexture`: The depth texture
 
 Output Parameters:
 
 * `out float3 worldSpaceDirection`: normalized world-space direction of the view ray
+* `out float depthWeighted`: average depth value along the ray
 
 Returns:
 
 `float4` with transmittance in r, integrated sun intensity in g,
-integrated ambient intensity in b, and average depth in a channels respectively.
+integrated ambient intensities in b and a channels respectively.
+
+##### Depth
 
 In most rendering pipelines and pathways where we will be implementing volumetric
 clouds, the camera's [depth texture](https://docs.unity3d.com/Manual/SL-DepthTextures.html)
 will be made available separately by Unity after rendering opaque objects.
 
-This function samples the depth texture to determine if an opaque objects exists
+The `linear01Depth` parameter is obtained by sampling the depth texture to determine if an opaque objects exists
 at finite depth, using the `SAMPLE_DEPTH_TEXTURE` macro from _UnityCG.cginc_.
 As discussed in the [depth texture](https://docs.unity3d.com/Manual/SL-DepthTextures.html)
 page, this is not the depth in meters, but a packed value ranging from 0-1 or
 1-0, depending on the UNITY_REVERSED_Z
 [preprocessor macro](https://docs.unity3d.com/Manual/SL-BuiltinMacros.html).
+Then we use the `Linear01Depth(...)` function to convert to a true linear
+fraction of the camera's possible depth.
 
-We can check for the existence of an object by checking the sample's value
-against the largest possible depth value in this range.
+If `linear01Depth` is 1, that means there was no opaque object writing to the
+depth buffer. If it's less, than we know where is an opaque object at that
+pixel.
 
-By using `LinearEyeDepth(...)` we can determine the distance of the opaque
-object, and use that to stop raymarching.
+In principle, we could allow clouds in front of opaque objects by performing
+raymarching only up to the physical depth indicated by this value. However,
+this introduces additional sorting issues with transparent objects, and is outside
+the scope of this tutorial.
 
-If there is an object in front of the clouds, we set the cloud fragment
+Instead, we could use the existence of object in front of the clouds to set the cloud fragment
 to empty: it has transmittance 1, intensity 0, and a far depth.
+When re-performing raymarching every frame, this is a fine approximation that
+will save processing the raymarching and allow final blending to properly
+reproduce the scene color.
+
+See the corresponding discussions in [History](History.md) and
+[Tutorial](.../Tutorial.md) discussions about depth handling.
+
+#### Extents
 
 Additionally, if the world-space direction of the view ray is negative in `y`,
 then we know it is pointing below the horizon.
@@ -470,9 +485,14 @@ it through the cloud to the camera, then (1 - Transmittance) is the _opacity_
 * `g`: The total intensity of light scattered from the sun through all points
 to the camera. Ignoring atmospheric effects, the sun light will be all of one
 color, so we need only to track the total intensity.
-* `b`: The total intensity of _ambient_ light scattered through all points
+* `b`: The total intensity of _ambient_ bottom light scattered through all points
 to the camera.
-* `a`: An estimate for the average depth of the clouds from the camera. This
+* `b`: The total intensity of _ambient_ top light scattered through all points
+to the camera.
+
+It also returns another output float:
+
+* An estimate for the average depth of the clouds from the camera. This
 can be used as a rough estimate to determine a 3D of the clouds along the
 view ray.
 

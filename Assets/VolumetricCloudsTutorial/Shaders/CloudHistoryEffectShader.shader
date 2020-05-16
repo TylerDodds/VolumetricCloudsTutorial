@@ -6,6 +6,8 @@
 	}
 
 	CGINCLUDE
+			
+	#define RAYMARCH_BEHIND_OBJECTS
 
 	#include "VertStructures.cginc"
 	#include "FragmentRaymarching.cginc"
