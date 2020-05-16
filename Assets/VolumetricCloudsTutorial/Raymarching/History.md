@@ -136,7 +136,7 @@ corresponding to such rays when the camera moves, and since the blend pass also
 performs a neighbourhood lookup, we may need to perform raymarching even several
 pixels from the edge of opaque objects in the scene.
 
-We'll use the keyword RAYMARCH_BEHIND_OBJECTS in this shader to ensure that
+Instead of sampling the depth, we'll just use a Linear01Depth value of 1 in this shader to ensure that
 the raymarch happens regardless of the content of the depth texture. This is a
 bit of a simplification, since we could try to identify these relevant edge
 pixels to perform raymarching on. However, this starts to blend into areas
