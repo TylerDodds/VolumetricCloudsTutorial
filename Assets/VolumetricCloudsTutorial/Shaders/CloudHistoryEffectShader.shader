@@ -7,8 +7,6 @@
 
 	CGINCLUDE
 			
-	#define RAYMARCH_BEHIND_OBJECTS
-
 	#include "VertStructures.cginc"
 	#include "FragmentRaymarching.cginc"
 	#include "RaymarchColor.cginc"
@@ -81,7 +79,7 @@
 				float offset = -frac(_RaymarchOffset + bayerOffset);
 				float3 worldSpaceDirection;
 				float depthWeight;
-				float farLinear01Depth = GetFarLinear01Depth(_CameraDepthTexture, uvDepth, _RaymarchedBuffer_TexelSize);
+				float farLinear01Depth = 1;//Don't sample from depth texture, since we'll always raymarch regardless of depth for the history effect
 				float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(farLinear01Depth, rayDirUnNorm, offset, worldSpaceDirection, depthWeight);
 				float fadeFactor = (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceDirection.y));
 				transmittanceAndIntegratedIntensities.gba *= fadeFactor;
