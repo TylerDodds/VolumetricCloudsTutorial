@@ -1,4 +1,6 @@
-﻿#if !defined(VCT_FRAGMENT_RAYMARCHING_INCLUDED)
+﻿// Upgrade NOTE: replaced 'defined RAYMARCH_BEHIND_OBJECTS' with 'defined (RAYMARCH_BEHIND_OBJECTS)'
+
+#if !defined(VCT_FRAGMENT_RAYMARCHING_INCLUDED)
 #define VCT_FRAGMENT_RAYMARCHING_INCLUDED
 
 #include "UnityCG.cginc"
@@ -20,15 +22,18 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float linear01Depth
 	// Reconstruct world space position & direction towards this screen pixel.
 	if (linear01Depth < 1)
 	{
+		#if defined (RAYMARCH_BEHIND_OBJECTS)
 		//For most pixels containing opaque objects, we will not see the clouds behind them.
 		//However, in the case of MSAA, and with downsampling, this will no longer be the case around the edges of objects.
 		//Additionally, the 3x3 neighbourhood lookup in the history pass will look up raymarch results at these pixels,
 		//and they will be uncovered upon camera movement, so there are many cases where we need a non-empty result
 		//in the raymarch or history buffer.
 		
-		//SET_FAR_DEPTH
 		//We can forego the performance improvements of skipping raymarching in this case in order to handle all of these issues.
 		//We must still check against the depth buffer in the final pass.
+		#else
+		SET_FAR_DEPTH
+		#endif
 	}
 	//TODO Handle cases of depth lookup when downsampling
 

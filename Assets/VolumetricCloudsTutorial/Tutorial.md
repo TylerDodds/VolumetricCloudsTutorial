@@ -73,11 +73,6 @@ TODO
 
 ## Project Set-Up
 
-### Color Space
-
-As discussed in [Lighting](Raymarching/Lighting.md), we should use a Linear
-color space, instead of a Gamma one.
-
 ### Image Effects
 
 We set up our Clouds rendering as a Unity Image Effect Component on the Camera
@@ -117,3 +112,40 @@ on how we will handle creation of Unity's `Texture3D` for the noise textures.
 ## Components
 
 TODO
+
+## Rendering Pipeline
+
+### Color Space
+
+As discussed in [Lighting](Raymarching/Lighting.md), we should use a Linear
+color space, instead of a Gamma one.
+
+### Antialiasing
+
+Our image effects rely on knowing the scene depth. As a result, it shares a
+similar [downside to deferred rendering](https://en.wikipedia.org/wiki/Deferred_shading)
+in that the [resolved camera depth texture](https://docs.unity3d.com/Manual/SL-DepthTextures.html)
+we can access in shaders will not match pixels on the edges of objects
+when [MSAA](https://docs.unity3d.com/ScriptReference/Camera-allowMSAA.html) is enabled.
+Therefore, while this effect does not particularly require
+either Forward or Deferred render paths, it is more compatible with the Deferred path.
+
+### Depth
+
+As discussed in [History](Raymarching/History.md), there will be cases where we
+need to look up raymarch results from pixels that would lie behind opaque objects
+in the scene, particularly those at the edge of objects. While Unity's
+[depth texture](https://docs.unity3d.com/Manual/SL-DepthTextures.html)
+can tell us which pixels are covered by opaque objects, we would need to
+determine from this the minimum depth of each pixel's neighbours (perhaps
+several pixels distant) to determine this.
+
+However, when considering a full pipeline, there will be many effects that may
+wish to transform the base depth texture. A
+[hierarchy](https://miketuritzin.com/post/hierarchical-depth-buffers/)
+of depth textures may be useful for faster lookup, for example.
+As a result, we will consider any such transformations out of scope of this
+project. We note that, particularly if there is significant coverage of
+geometry above the horizon, where raymarch distances are longest,
+it could be worth it to perform this local minimum depth transformation and
+skip raymarching where it's not needed, particularly if the geometry is static.

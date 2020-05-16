@@ -127,6 +127,22 @@ configuration parameters, using half-resolution buffers is not noticeably
 visually different from full-resolution ones, and saves a significant amount
 of execution time.
 
+### Depth
+
+As dicussed in [Raymarching](Raymarching.md), in the normal frame-by-frame case,
+raymarching does not need to be performed along a ray that is behind an opaque pixel in the
+scene. However, since the history effect may need to look up the history buffer
+corresponding to such rays when the camera moves, and since the blend pass also
+performs a neighbourhood lookup, we may need to perform raymarching even several
+pixels from the edge of opaque objects in the scene.
+
+We'll use the keyword RAYMARCH_BEHIND_OBJECTS in this shader to ensure that
+the raymarch happens regardless of the content of the depth texture. This is a
+bit of a simplification, since we could try to identify these relevant edge
+pixels to perform raymarching on. However, this starts to blend into areas
+belonging to the rendering pipeline as a whole; as discussed in [Tutorial](Tutorial.md),
+these areas are out of scope for this project.
+
 ## Passes
 
 ### 0: Raymarch (Moderate Quality)

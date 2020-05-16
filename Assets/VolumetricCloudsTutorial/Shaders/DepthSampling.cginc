@@ -10,7 +10,7 @@ float SampleLinear01Depth(sampler2D _CameraDepthTexture, float2 uv_depth)//TODO 
 	return depth;
 }
 
-float GetFarLinear01Depth_Downsample1(sampler2D depthTex, float2 uv, float2 texelSize)
+float GetFarLinear01Depth_Downsample1(sampler2D depthTex, float2 uv, float2 texelSize)//TODO Remove this if not needed
 {
 	float4 o = texelSize.xyxy * float2(-1, 1).xxyy * 1;//Shift of -/+ quarter texel to sample center of neighbouring non-downscaled depth texture
 	float depth1 = SampleLinear01Depth(depthTex, uv + o.xy);
