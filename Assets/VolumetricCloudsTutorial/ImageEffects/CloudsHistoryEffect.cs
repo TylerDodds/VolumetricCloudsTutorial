@@ -56,7 +56,6 @@ namespace VolumetricCloudsTutorial.ImageEffects
             material.SetVector("_RaymarchedBuffer_TexelSize", _raymarchedBuffer.texelSize);
             BlitMRT(raymarchRenderTargetSetup, false, material, 0);
 
-            //TODO ensure depth blending is correct around edges of objects! Particularly from downsampling, MSAA, and ClipToAABB
             //Pass 1: blending into active history buffer
             if (_isFirstFrame)
             {

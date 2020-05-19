@@ -17,7 +17,7 @@
 	uniform float4 _AmbientBottom;
 	uniform float4 _AmbientTop;
 
-	/// Perform raymarching in the view direction to determine transmittance and intensity, 
+	/// Perform raymarching in the view direction to determine transmittance and intensity,
 	/// then find final pixel color.
 	half4 frag(InterpolatorsUvScreenViewPos i) : SV_Target
 	{
@@ -50,7 +50,6 @@
 		finalColor.a = LinearToGammaSpaceExact(finalColor.a);
 		#endif
 		return finalColor;
-		//TODO Handle clouds in front of transparent objects? do clouds first then skybox 'underneath' with its own separate blending?
 	}
 
 	ENDCG
