@@ -14,7 +14,16 @@ camera.
 
 ## Prerequisites
 
-TODO
+We'll be using Unity's default
+[built-in render pipeline](https://docs.unity3d.com/Manual/built-in-render-pipeline.html),
+using the [OnRenderImage](https://docs.unity3d.com/Manual/ExecutionOrder.html#Rendering)
+callback to add clouds to the scene using post-processing.
+Therefore, most version of Unity from 5.6 up to the latest (2019.3) should be
+compatible.
+
+We will also need the ability to compile and run C++ projects; we will use one
+to pre-generate texture containing the procedural noise values we will use to
+build up the clouds.
 
 ## Volumetric Rendering Overview
 
@@ -55,6 +64,7 @@ successive steps and adding them up. To do this, we will write an image effect
 that will evaluate a custom shader at every pixel on the screen, determine the
 camera's view ray from that pixel, and perform raymarching through the portion
 of the atmosphere where clouds occur.
+See the [Raymarching page](Raymarching/Raymarching.md) for more details.
 
 To determine the lighting contribution at each raymarch step in (3), we will
 first begin by considering light that has undergone scattering _one_ time from
@@ -68,8 +78,7 @@ light intensity that has not been scattered or absorbed on its way to that point
 then the fraction of light that will be scattered in the direction of the camera,
 then the fraction that will not be scattered or absorbed on its way out of the
 cloud before it reaches the camera.
-
-TODO
+See the [Lighting page](Raymarching/Lighting.md) for more details.
 
 ## Project Set-Up
 
@@ -109,7 +118,7 @@ These textures will be a mixture of 2D and 3D. See the
 [Noise Textures](CloudDensity/NoiseTextures/NoiseTextures.md) page for details
 on how we will handle creation of Unity's `Texture3D` for the noise textures.
 
-## Components
+## Unity Components
 
 TODO
 
@@ -159,3 +168,31 @@ longer reflect the appropriate cloud distance.
 Objects with transparency introduce sorting issue that would
 need to be handled by including the clouds in a completely different place in the
 rendering pipeline.
+
+## Tutorial Reading
+
+This tutorial has linked to many other Markdown files discussing different
+components of cloud rendering. A suggested reading order might be as follows:
+
+* Tutorial
+  * This page gives a high-level overview of cloud rendering, project setup and scope.
+* [Image Effects](ImageEffects/ImageEffects.md)
+  * Discusses the basic setup we will use to perform cloud rendering using our
+  custom image effects via the `OnRenderImage` callback.
+* [Cloud Density](CloudDensity/CloudDensity.md)
+  * Discusses the hierarchical steps we will take to build a representation of
+  the three-dimensional cloud density function that we will sample in our
+  shaders.
+* [Noise Textures](CloudDensity/NoiseTextures/NoiseTextures.md)
+  * Discusses specifics of the generation and packing of the noise textures
+  used to build up the cloud density.
+* [Raymarching](Raymarching/Raymarching.md)
+  * Discusses how step-by-step raymarching samples the cloud density and
+  builds up the profile of light transmittance and scattering.
+* [Lighting](Raymarching/Lighting.md)
+  * Discusses scattering of directional light from the sun, self-shadowing of this
+  light as it initially passes through clouds,
+  and ambient lighting approximations.
+* [History](Raymarching/History.md)
+  * Discusses how to combine previous frames' raymarching results to mitigate
+  issues from large raymarching step sizes.
