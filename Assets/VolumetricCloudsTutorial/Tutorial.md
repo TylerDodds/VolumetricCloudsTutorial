@@ -8,7 +8,7 @@ density, and real-time evolution of the clouds in an artist-controllable
 fashion, not attempting an exact simulation.
 
 For simplicity, we will limit our implementation to one where the clouds are
-always the furthest semitransparent object rendered. Additionally, we will not
+always the furthest object rendered. Additionally, we will not
 model atmospheric scattering effects of light passing from the clouds to the
 camera.
 
@@ -149,3 +149,13 @@ project. We note that, particularly if there is significant coverage of
 geometry above the horizon, where raymarch distances are longest,
 it could be worth it to perform this local minimum depth transformation and
 skip raymarching where it's not needed, particularly if the geometry is static.
+
+Similarly, due to considerations in our [History](Raymarching/History.md)-based
+implementation, we will not consider the case where clouds may be in front
+of objects -- opaque or otherwise. While we may handle opaque objects by
+raymarching only to the distance indicated by the scene's depth at each pixel,
+moving objects will create visual artifacts as the historical results no
+longer reflect the appropriate cloud distance.
+Objects with transparency introduce sorting issue that would
+need to be handled by including the clouds in a completely different place in the
+rendering pipeline.
