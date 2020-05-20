@@ -41,7 +41,7 @@
 
 		float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(transmittanceAndIntegratedIntensities, _AmbientBottom, _AmbientTop);
 
-		raymarchColor *= (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceDirection.y));//Multiply by fade-out factor for far-away clouds, acting like 'fade to skybox' (really should fade to atmospheric scattering value).
+		raymarchColor *= GetHorizonFadeFactor(worldSpaceDirection);
 		//TODO A whole atmospheric scattering solution is needed if we don't wish to perform this simple approximation.
 
 		float4 finalColor = raymarchColor + sceneColor * (1 - raymarchColor.a);//premultiplied alpha
