@@ -81,7 +81,7 @@
 				float depthWeight;
 				float farLinear01Depth = 1;//Don't sample from depth texture, since we'll always raymarch regardless of depth for the history effect
 				float4 transmittanceAndIntegratedIntensities = FragmentTransmittanceAndIntegratedIntensitiesAndDepth(farLinear01Depth, rayDirUnNorm, offset, worldSpaceDirection, depthWeight);
-				float fadeFactor = (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceDirection.y));
+				float fadeFactor = GetHorizonFadeFactor(worldSpaceDirection);
 				transmittanceAndIntegratedIntensities.gba *= fadeFactor;
 				transmittanceAndIntegratedIntensities.r = 1 - (1 - transmittanceAndIntegratedIntensities.r) * fadeFactor;//Multiply opacity (1 - transmittance) by fadeFactor
 

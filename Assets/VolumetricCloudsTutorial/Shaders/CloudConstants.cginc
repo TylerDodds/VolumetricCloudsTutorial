@@ -10,7 +10,7 @@ static const float cloudSlabHeight = 3500;
 static const float fadeMinDistance = 10000;
 /// Completely fade out clouds at this distance
 static const float fadeMaxDistance = 20000;
-/// Begin to fade out clouds at this angle from the horizon
+/// Fade out clouds from this angle below the horizon
 static const float fadeHorizonAngle = 0.01;
 
 /// Do not raymarch more than this distance, even if it doesn't get through all the of atmosphere
@@ -26,5 +26,10 @@ static const float _farDepth = 1e6;
 
 /// Maximum value of detail density to remap to zero
 static const float _maxDetailRemapping = 0.8;
+
+float GetHorizonFadeFactor(float3 worldSpaceRaymarchDirection)
+{
+	return (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceRaymarchDirection.y));
+}
 
 #endif // VCT_CLOUD_CONSTANTS_INCLUDED

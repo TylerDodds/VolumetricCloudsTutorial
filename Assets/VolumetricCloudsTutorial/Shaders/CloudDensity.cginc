@@ -110,6 +110,7 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	coverage = RemapClamped(coverage * _CloudCoverageMultiplier.x, 0.0, 1.0, _CloudCoverageMinimum, 1.0);
 	coverage = pow(coverage, Remap(heightFraction, 0.7, 1, 1.0, 1 - _AnvilBias));
 	coverage = min(coverage, 1 - distanceFraction);
+	//Multiply coverage by fade-out factor for far-away clouds, acting like 'fade to skybox'. NB This should be properly replaced by an atmospheric scattering solution.
 	wetness = cloudCoverageWetnessType.g;
 	float cloudType = saturate(cloudCoverageWetnessType.b * _CloudTypeMultiplier);
 
