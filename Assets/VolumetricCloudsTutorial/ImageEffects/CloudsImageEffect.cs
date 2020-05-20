@@ -8,6 +8,7 @@ namespace VolumetricCloudsTutorial.ImageEffects
     /// </summary>
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
+    [AddComponentMenu("Volumetric Clouds/Clouds Per-Frame Raymarching")]
     public class CloudsImageEffect : Base.CloudEffectBase
     {
         /// <summary>

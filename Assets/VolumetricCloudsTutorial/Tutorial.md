@@ -96,10 +96,6 @@ For similar compatibility reasons, we will keep our work within the Assets
 folder. With the appropriate Assembly Definition Files and manifest, it could be
 converted to the Unity Package Manager format.
 
-### Shaders
-
-TODO
-
 ### Noise and Lookup Textures
 
 As discussed in the [Cloud Density](CloudDensity/CloudDensity.md) page, we
@@ -120,7 +116,31 @@ on how we will handle creation of Unity's `Texture3D` for the noise textures.
 
 ## Unity Components
 
-TODO
+We'll provide two different implementations of cloud rendering as Components
+that will live on the Main Camera. We'll label them under 'Volumetric Clouds'
+in the Add Component Menu.
+
+### Clouds Per-Frame Raymarching
+
+This is the `CloudsImageEffect.cs` component, and one that simply re-performs
+the raymarching from scratch every frame.  However, this means that a small
+raymarch step size (higher quality) is needed to avoid sampling artifacts.
+
+Nonetheless, it is a good starting point to understanding how to perform
+raymarching. Dive into
+`CloudsImageEffectShader.shader` to see the raymarch setup, integration of
+transmittance and light intensities, and final coloring.
+
+### Clouds Raymarching and History
+
+This is the `CloudsHistoryEffect.cs` component, and combines the previous frame's
+final raymarch results (-- )transmittance and light intensities) along with
+the current frame's raymarch to produce a higher-quality result.
+
+Jump into `CloudsHistoryEffectShader.shader` and the
+[History page](Raymarching/History.md) to see how this blending is performed,
+and the considerations required to avoid introducing new artifacts into
+the final result.
 
 ## Rendering Pipeline
 
@@ -168,6 +188,11 @@ longer reflect the appropriate cloud distance.
 Objects with transparency introduce sorting issue that would
 need to be handled by including the clouds in a completely different place in the
 rendering pipeline.
+
+## Configuration
+
+TODO - discuss thus here or elsewhere? Perhaps another .md file to be read
+after Lighting?
 
 ## Tutorial Reading
 
