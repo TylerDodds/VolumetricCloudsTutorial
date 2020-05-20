@@ -1,4 +1,4 @@
-﻿Shader "Hidden/VolumetricCloudsTutorial/CloudImageEffectShader"
+﻿Shader "Hidden/VolumetricCloudsTutorial/CloudsImageEffectShader"
 {
 	Properties
 	{

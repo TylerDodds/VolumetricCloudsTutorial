@@ -1,4 +1,4 @@
-﻿Shader "Hidden/VolumetricCloudsTutorial/CloudHistoryEffectShader"
+﻿Shader "Hidden/VolumetricCloudsTutorial/CloudsHistoryEffectShader"
 {
 	Properties
 	{

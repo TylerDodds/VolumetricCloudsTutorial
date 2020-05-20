@@ -8,6 +8,7 @@ namespace VolumetricCloudsTutorial.ImageEffects
     /// </summary>
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
+    [AddComponentMenu("Volumetric Clouds/Clouds Raymarching and History")]
     public class CloudsHistoryEffect : Base.CloudEffectBase
     {
         [SerializeField] [Range(0, 2)] private int _downscaling = 0;
