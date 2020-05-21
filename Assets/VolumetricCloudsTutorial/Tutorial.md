@@ -142,6 +142,13 @@ Jump into `CloudsHistoryEffectShader.shader` and the
 and the considerations required to avoid introducing new artifacts into
 the final result.
 
+### Cloud Configuration
+
+This is a `ScriptableObject` parametrizing cloud density, raymarching and lighting.
+Each of the raymarching components serializes a reference to an instance of
+this type. See the tooltips and documentation in `CloudConfiguration.cs`
+for details.
+
 ## Rendering Pipeline
 
 ### Color Space
@@ -188,11 +195,6 @@ longer reflect the appropriate cloud distance.
 Objects with transparency introduce sorting issue that would
 need to be handled by including the clouds in a completely different place in the
 rendering pipeline.
-
-## Configuration
-
-TODO - discuss thus here or elsewhere? Perhaps another .md file to be read
-after Lighting?
 
 ## Tutorial Reading
 
