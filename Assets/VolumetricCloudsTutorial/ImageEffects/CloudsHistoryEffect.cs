@@ -11,8 +11,16 @@ namespace VolumetricCloudsTutorial.ImageEffects
     [AddComponentMenu("Volumetric Clouds/Clouds Raymarching and History")]
     public class CloudsHistoryEffect : Base.CloudEffectBase
     {
+        /// <summary>
+        /// The power of 2 used to downscale raymarching and history blending textures from the screen size. 
+        /// </summary>
+        [Tooltip("The power of 2 used to downscale raymarching and history blending textures from the screen size.")]
         [SerializeField] [Range(0, 2)] private int _downscaling = 0;
 
+        /// <summary>
+        /// The half-life used during the blending update.
+        /// </summary>
+        [Tooltip("The half-life used during the blending update.")]
         [SerializeField] [Range(0.01f, 1)] private float _blendHalfLife = 0.23f;
 
         /// <summary>

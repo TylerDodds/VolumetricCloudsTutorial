@@ -11,18 +11,21 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
     public abstract class CloudEffectBase : ImageEffectBase
     {
         /// <summary>
-        /// The quality of the raymarch step size.
+        /// The quality of the raymarch step size (smaller steps for higher quality).
         /// </summary>
+        [Tooltip("The quality of the raymarch step size (smaller steps for higher quality).")]
         [SerializeField] private RaymarchStepQuality _raymarchStepQuality = RaymarchStepQuality.Normal;
 
         /// <summary>
         /// If adaptive step size raymarching should be used.
         /// </summary>
+        [Tooltip("If adaptive step size raymarching should be used")]
         [SerializeField] private bool _adaptiveStepSize = false;
 
         /// <summary>
         /// The <see cref="CloudConfiguration"/> reference containing cloud rendering parameters.
         /// </summary>
+        [Tooltip("The CloudConfiguration reference containing cloud rendering parameters.")]
         #pragma warning disable 0649
         [SerializeField] private CloudConfiguration _cloudConfiguration;
         #pragma warning restore 0649

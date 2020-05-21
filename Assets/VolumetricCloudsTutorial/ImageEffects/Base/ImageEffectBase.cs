@@ -190,6 +190,7 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         /// Shader for the image effect, to be serialized and set in the Inspector
         /// </summary>
         #pragma warning disable 0649
+        [Tooltip("Shader used for the image effect.")]
         [SerializeField] Shader _shader;
         #pragma warning restore 0649
 
