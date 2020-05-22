@@ -6,7 +6,7 @@
 	}
 
 	CGINCLUDE
-			
+
 	#include "VertStructures.cginc"
 	#include "FragmentRaymarching.cginc"
 	#include "RaymarchColor.cginc"
@@ -190,7 +190,7 @@
 
 				//Determine how far out of bounds, and blend accordingly.
 				const float historyMinUpdateFraction = unity_DeltaTime.x * _Ln2OverBlendHalfLife;
-				float4 blendedSample = lerp(prevSample, raymarchResult, max(historyMinUpdateFraction, step(0, outOfProjectionBB)));//TODO Better blending?
+				float4 blendedSample = lerp(prevSample, raymarchResult, max(historyMinUpdateFraction, step(0, outOfProjectionBB)));
 
 				return blendedSample;
 			}
