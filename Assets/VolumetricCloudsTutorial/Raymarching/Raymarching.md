@@ -186,9 +186,10 @@ assumption: looking directly down, the player will be looking into the ground or
 floor, and at the horizon there will be other elements in the distance
 (buildings, hills, etc) to cover up the clouds there.
 
-We will begin fading out the clouds when the view vector is horizontal, and stop
-performing raymarching  completely at some small angle below that. Recall that
-these  clouds will be far away due to the Earth's curvature, so the effect is to
+To ensure this effect is visually continuous,
+we will begin fading out the clouds when the view vector is horizontal, and stop
+performing raymarching completely at some small angle below that. Recall that
+these clouds will be far away due to the Earth's curvature, so the effect is to
 fade out clouds based on distance.
 
 Additionally, we will only perform raymarching up to a certain distance from the
@@ -198,10 +199,17 @@ the maximum step size (leading to larger steps and poorer quality).
 By taking `raymarchDistance = min(raymarchDistance, maxRaymarchDistance)`, we
 can keep the step size and number under control.
 
+To again help ensure a continuous look from this raymarch distance maximum,
+we will fade out based on horizontal distance from the origin. Since this
+changes each step of the raymarch,
+(while the view direction changes only per-pixel)
+we will fade out the cloud coverage
+(see [CloudDensity](../CloudDensity/CloudDensity.md)).
+
 We note again that this scenario is most prevalent near the horizon, where we
 are looking through a larger portion of the atmosphere than looking
 straight up. For such far-away clouds, capturing the closer-by portion is
-good enough.
+visually sufficient.
 
 ## Raymarching Math (`RaymarchIntegral.cginc`)
 
@@ -265,7 +273,7 @@ should be 1 / meters so that the optical depth is unitless, so that
 with units m^2 / kg.
 
 However, when we consider the cloud density (see
-[CloudDensity](../CloudDensity.md)) and &sigma;<sub>E</sub> values, we will be
+[CloudDensity](../CloudDensity/CloudDensity.md)) and &sigma;<sub>E</sub> values, we will be
 ignoring these units, and consider cloud density to range from 0 to 1. We will
 then parameterize &sigma;<sub>E</sub> to achieve clouds with the desired look.
 
