@@ -58,8 +58,6 @@ namespace VolumetricCloudsTutorial.ImageEffects
             RenderTargetSetup raymarchRenderTargetSetup = new RenderTargetSetup(_raymarchColorBuffers, _raymarchedBuffer.depthBuffer);
 
             //Pass 0 into raymarched buffer, with regular sampling quality.
-            SetKeyword("DOWNSAMPLE_1", _downscaling == 1);
-            SetKeyword("DOWNSAMPLE_2", _downscaling == 2);
             material.SetVector("_ProjectionExtents", GetProjectionExtents(camera));
             material.SetFloat("_RaymarchOffset", _lowDiscrepancySequence.GetNextValue());
             material.SetVector("_RaymarchedBuffer_TexelSize", _raymarchedBuffer.texelSize);
