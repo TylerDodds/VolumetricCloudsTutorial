@@ -240,6 +240,10 @@ Another visual effect we apply is to multiply the density by the coverage,
 which makes edges of the cloud wispier and tends to lighten them. Again, we
 parametrize the strength of this effect so a target look can be easily achieved.
 
+As discussed in
+[Raymarching](../Raymarching/Raymarching.md), we will fade out the coverage at
+far distances, so that the density will go to zero smoothly.
+
 ## Height
 
 Clouds have significantly different density profiles over their height ranges,

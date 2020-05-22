@@ -279,6 +279,8 @@ above, preferring the look of the final output.
 
 ## Final Lighting
 
+### Color
+
 After the raymarching has been performed, we have the final transmittance from
 the end point of the raymarch to the camera, as well as integrated intensity
 _fractions_ for the sun (directional), ambient top, and ambient bottom light
@@ -297,6 +299,22 @@ additional flexibility in how we encode these intensity fractions. This is
 important when we try to use the previous frame's raymarch result to improve
 the final look -- we will save the intensity fractions from frame to frame, and
 have full control how those values are encoded and stored.
+
+### Atmospheric Scattering
+
+Throughout our raymarching, density, and scattering calculations,
+we've considered scattering coming from the clouds themselves.
+What is outside of scope for this project is
+[Atmospheric Scattering](https://developer.nvidia.com/gpugems/gpugems2/part-ii-shading-lighting-and-shadows/chapter-16-accurate-atmospheric-scattering), the scattering of light caused by the rest of the
+atmosphere.
+
+Light will be scattered by the atmosphere before it reaches the clouds, and
+also between the clouds and the camera. Furthermore, the presence of clouds
+will affect the usual calculations for atmospheric scattering, which will likely
+assume an atmospheric density that falls off only with height.
+
+Atmospheric scattering is an important consideration to generate visually
+consistent results of rendering the whole sky and other far-away elements.
 
 ## Color Space
 

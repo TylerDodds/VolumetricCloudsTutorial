@@ -42,7 +42,6 @@
 		float4 raymarchColor = RaymarchColorLitAnalyticalTransmittanceIntensity(transmittanceAndIntegratedIntensities, _AmbientBottom, _AmbientTop);
 
 		raymarchColor *= GetHorizonFadeFactor(worldSpaceDirection);
-		//TODO A whole atmospheric scattering solution is needed if we don't wish to perform this simple approximation.
 
 		float4 finalColor = raymarchColor + sceneColor * (1 - raymarchColor.a);//premultiplied alpha
 		#if UNITY_COLORSPACE_GAMMA

@@ -38,8 +38,8 @@ float HeightFraction(float effectiveVerticalHeight)
 }
 
 /// Determines the fraction within the atmosphere's height,
-/// given a world-space position, 
-/// assuming a shell that is not perfectly spherical, 
+/// given a world-space position,
+/// assuming a shell that is not perfectly spherical,
 /// instead of constant vertical height.
 float HeightFractionCylindrical(float3 worldPos)
 {
@@ -49,7 +49,7 @@ float HeightFractionCylindrical(float3 worldPos)
 }
 
 /// Determines the fraction within the atmosphere's height,
-/// given a world-space position, 
+/// given a world-space position,
 /// assuming a perfectly spherical shell based on earth center and radius.
 float HeightFractionSpherical(float3 worldPos)
 {
@@ -109,8 +109,7 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	float coverage = cloudCoverageWetnessType.r;
 	coverage = RemapClamped(coverage * _CloudCoverageMultiplier.x, 0.0, 1.0, _CloudCoverageMinimum, 1.0);
 	coverage = pow(coverage, Remap(heightFraction, 0.7, 1, 1.0, 1 - _AnvilBias));
-	coverage = min(coverage, 1 - distanceFraction);
-	//Multiply coverage by fade-out factor for far-away clouds, acting like 'fade to skybox'. NB This should be properly replaced by an atmospheric scattering solution.
+	coverage = min(coverage, 1 - distanceFraction);//Multiply coverage by fade-out factor for far-away points
 	wetness = cloudCoverageWetnessType.g;
 	float cloudType = saturate(cloudCoverageWetnessType.b * _CloudTypeMultiplier);
 
@@ -135,7 +134,7 @@ float GetDetailDensity(float3 posBase, float3 animatedPos, float heightFraction,
 #endif
 	float3 posWithCurl = animatedPos;
 	posWithCurl.xyz += curlNoise * _CloudScale * (1 - heightFraction) * _CurlStrength;
-	
+
 	float3 detailSample = tex3Dlod(_DetailDensityNoise, float4(posWithCurl / _CloudScale * _DetailTiling, lod)).rgb;
 	float detailFactor = UnpackOctaves(detailSample.rgb);
 	detailFactor = lerp(1 - detailFactor, detailFactor, erosion);
