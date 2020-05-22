@@ -15,10 +15,6 @@ uniform float _SigmaScattering = 0.1;
 /// Otherwise, it uses just a single step of the base step size.
 float2 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float stepSizeBase, float3 raymarchStart, float3 raymarchDirection, int lod, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
 {
-	//TODO Based on transmittance = exp(-baseDensities.z * _SigmaExtinctionScattering_EccentricityDeltaForwardBack.x * stepSize), then we want to make sure we are doing appropriate-sized steps
-	//Something like: target_step_size = -log(target_transmittance) / (baseDensities.z * _SigmaExtinctionScattering_EccentricityDeltaForwardBack.x)
-	//We can actually precalculate { -log(target_transmittance) / _SigmaExtinctionScattering_EccentricityDeltaForwardBack.x) } for speed.
-
 	float nextOffset = offsets.z + stepSizeBase;
 	float finalOffset = nextOffset;
 	float3 finalPosition;
