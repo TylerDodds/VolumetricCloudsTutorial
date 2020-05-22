@@ -220,8 +220,6 @@ namespace VolumetricCloudsTutorial.Configuration
         /// <summary> Fraction of full scattering intensity used for wet clouds. </summary>
         public float WetIntensityFraction { get { return _wetIntensityFraction; } }
 
-        //TODO - finish comments and tooltips, also for both components
-
         /// <summary> Sets cloud shader properties for the given material based on the configuration values. </summary>
         public void SetMaterialProperties(Material material)
         {
