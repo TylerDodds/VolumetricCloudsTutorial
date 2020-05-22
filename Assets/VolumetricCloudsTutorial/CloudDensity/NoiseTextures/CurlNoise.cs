@@ -41,7 +41,7 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
             if (activeObject != null && activeObject.GetType() == typeof(Texture2D))
             {
                 Texture2D tex2D = (Texture2D)activeObject;
-                Texture2D curlTexture = CreateCurlNoiseFromSelectedTexture(tex2D, threeChannelsOut, mipmap: true);
+                Texture2D curlTexture = CreateCurlNoiseFromSelectedTexture(tex2D, threeChannelsOut, mipmap: true, uniformScaling: true);
                 if (curlTexture != null)
                 {
                     string message = "Save Curl Texture";
@@ -64,8 +64,9 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         /// <param name="baseTexture">The input <see cref="Texture2D"/>.</param>
         /// <param name="threeChannelsOut">If the curl will have values in three channels instead of two.</param>
         /// <param name="mipmap">If the resulting texture should have Mipmaps generated.</param>
+        /// <param name="uniformScaling">If all three channels should be rescaled into the same range, instead of on a per-channel basis.</param>
         /// <returns>The generated curl <see cref="Texture3D"/>.</returns>
-        public static Texture2D CreateCurlNoiseFromSelectedTexture(Texture2D baseTexture, bool threeChannelsOut, bool mipmap)
+        public static Texture2D CreateCurlNoiseFromSelectedTexture(Texture2D baseTexture, bool threeChannelsOut, bool mipmap, bool uniformScaling)
         {
             int width = baseTexture.width;
             int height = baseTexture.height;
@@ -101,7 +102,6 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
             }
 
             //Rescale components so we can pack into uniform range
-            //TODO only one uniform scale for all channels?
             var minR = curlValues.Min(v => v.x);
             var minG = curlValues.Min(v => v.y);
             var minB = curlValues.Min(v => v.z);
@@ -112,6 +112,13 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
             var scaleR = GetMaxAbsScale(minR, maxR);
             var scaleG = GetMaxAbsScale(minG, maxG);
             var scaleB = GetMaxAbsScale(minB, maxB);
+            if (uniformScaling)
+            {
+                var maxScale = Mathf.Max(Mathf.Max(scaleR, scaleG), scaleB);
+                scaleR = maxScale;
+                scaleG = maxScale;
+                scaleB = maxScale;
+            }
 
             Color[] finalValues = new Color[curlValues.Length];
             for(int i = 0; i < curlValues.Length; i++)
