@@ -14,7 +14,7 @@ float4 FragmentTransmittanceAndIntegratedIntensitiesAndDepth(float linear01Depth
 	float3 startPos = _WorldSpaceCameraPos + ray;
 	worldSpaceDirection = normalize(ray);
 
-	#define SET_FAR_DEPTH depthWeighted = _farDepth;return float4(1, 0, 0, 0);
+	#define SET_FAR_DEPTH depthWeighted = farDepth;return float4(1, 0, 0, 0);
 
 	// Reconstruct world space position & direction towards this screen pixel.
 	if (linear01Depth < 1)
