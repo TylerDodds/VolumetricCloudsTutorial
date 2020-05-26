@@ -166,6 +166,21 @@ when [MSAA](https://docs.unity3d.com/ScriptReference/Camera-allowMSAA.html) is e
 Therefore, while this effect does not particularly require
 either Forward or Deferred render paths, it is more compatible with the Deferred path.
 
+### Tonemapping
+
+Our image effects happen in Linear space, returning HDR color values that convey
+corresponding light intensities. Unless rendering to an HDR display, these values
+need to be converted to the color range of [0, 1] for display on regular monitors.
+This process is known as [Tone mapping](https://en.wikipedia.org/wiki/Tone_mapping),
+and if we [don't  perform it](https://docs.unity3d.com/Manual/HDR.html),
+all HDR color channel values greater than 1 will be truncated.
+
+Since we are using the Build-In Render Pipeline, we
+[won't have built-in post-processing effects](https://docs.unity3d.com/Manual/PostProcessingOverview.html),
+so we'll need to use the
+[Post-Processing Package](https://docs.unity3d.com/Packages/com.unity.postprocessing@2.3/manual/Color-Grading.html)
+in the Package Manager to add Tonemapping to our scenes.
+
 ### Depth
 
 As discussed in [History](Raymarching/History.md), there will be cases where we
