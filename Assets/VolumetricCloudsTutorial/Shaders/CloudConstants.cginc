@@ -4,7 +4,7 @@
 /// Height of the clouds bottom
 static const float cloudHeight = 1500;
 /// Total height of the clouds from bottom to top
-static const float cloudSlabHeight = 3500;
+static const float cloudSlabHeight = 5500;
 
 /// Begin to fade out clouds at this distance
 static const float fadeMinDistance = 10000;
