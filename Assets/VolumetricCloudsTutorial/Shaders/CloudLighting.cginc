@@ -65,9 +65,8 @@ float GetIsotropicScatteringRate(float heightFraction, float baseDensity, float 
 	float verticalScatteringRate = pow(RemapClamped(heightFraction, _HeightScattering_Low_High_Min_Power.x, _HeightScattering_Low_High_Min_Power.y, _HeightScattering_Low_High_Min_Power.z, 1.0), _HeightScattering_Low_High_Min_Power.w);
 	float depthScatteringBase = pow(saturate(baseDensity), RemapClamped(heightFraction, _DepthScattering_Low_High_Min_Max.x, _DepthScattering_Low_High_Min_Max.y, _DepthScattering_Low_High_Min_Max.z, _DepthScattering_Low_High_Min_Max.w));
 	//TODO Add some sort of multiplier to handle very high powers? In these cases almost all of the intensity is lost
-	float depthScatteringRate = lerp(0.05 + depthScatteringBase, 1.0, saturate(lightDirectionOpticalDistance / stepSize));
+	float depthScatteringRate = lerp(0.05 + depthScatteringBase, 1.0, saturate(lightDirectionOpticalDistance / depthScatteringDistanceScale));
 	//TODO Parametrize depth scattering on something other than step size?
-	//TODO Should light optical distance be used when applied to ambient scattering?
 	float isotropicScatteringRate = verticalScatteringRate * depthScatteringRate;
 	return isotropicScatteringRate;
 }
