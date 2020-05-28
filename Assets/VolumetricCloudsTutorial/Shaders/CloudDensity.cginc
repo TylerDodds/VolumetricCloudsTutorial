@@ -87,7 +87,7 @@ float DensityWithCoverage(float density, float coverage)
 	return density;
 }
 
-float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
+bool GetWeatherInformation(float3 pos, out float wetness, out float3 animatedPos, out float heightFraction, out float heightDensity, out float erosion, out float coverage)
 {
 	float3 posBeforeAnimation = pos;
 
@@ -97,8 +97,10 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	{
 		wetness = 0;
 		animatedPos = pos;
+		heightDensity = 0;
 		erosion = 0;
-		return 0;
+		coverage = 0;
+		return false;
 	}
 
 	animatedPos = ApplyWind(posBeforeAnimation, heightFraction);
@@ -106,23 +108,37 @@ float GetBaseDensity(float3 pos, int lod, out float wetness, out float3 animated
 	//Get weather data: cloud coverage, wetness, and type.
 	float4 weatherUV = float4(0.5 + posBeforeAnimation.xz / _WeatherScale, 0, 0);
 	float3 cloudCoverageWetnessType = tex2Dlod(_WeatherTex, weatherUV);
-	float coverage = cloudCoverageWetnessType.r;
+	coverage = cloudCoverageWetnessType.r;
 	coverage = RemapClamped(coverage * _CloudCoverageMultiplier.x, 0.0, 1.0, _CloudCoverageMinimum, 1.0);
 	coverage = pow(coverage, Remap(heightFraction, 0.7, 1, 1.0, 1 - _AnvilBias));
 	coverage = min(coverage, 1 - distanceFraction);//Multiply coverage by fade-out factor for far-away points
 	wetness = cloudCoverageWetnessType.g;
 	float cloudType = saturate(cloudCoverageWetnessType.b * _CloudTypeMultiplier);
 
-	float2 densityErosion = tex2Dlod(_DensityErosionTex, float4(cloudType, heightFraction, 0.0, 0.0)).rg;
-	erosion = densityErosion.y;
+	float2 heightDensityErosion = tex2Dlod(_DensityErosionTex, float4(cloudType, heightFraction, 0.0, 0.0)).rg;
+	heightDensity = heightDensityErosion.x;
+	erosion = heightDensityErosion.y;
+	return true;
+}
 
+float GetBaseDensityFromWeather(float lod, float wetness, float3 animatedPos, float heightFraction, float heightDensity, float coverage)
+{
 	float3 baseUv = animatedPos / _CloudScale * _BaseDensityTiling;
-	float4 baseNoiseValue = tex3Dlod(_BaseDensityNoise, float4(baseUv, 0));
+	float4 baseNoiseValue = tex3Dlod(_BaseDensityNoise, float4(baseUv, lod));
 	float density = UnpackPerlinWorleyBaseNoise(baseNoiseValue, _CloudDensityOffset);
-	density *= densityErosion.x;
+	density *= heightDensity;
 	density = DensityWithCoverage(density, coverage);
 
 	return density;
+}
+
+float GetBaseDensity(float3 pos, float lod, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
+{
+	float heightDensity;
+	float coverage;
+	bool gotWeather = GetWeatherInformation(pos, wetness, animatedPos, heightFraction, heightDensity, erosion, coverage);
+
+	return GetBaseDensityFromWeather(lod, wetness, animatedPos, heightFraction, heightDensity, coverage);
 }
 
 float GetDetailDensity(float3 posBase, float3 animatedPos, float heightFraction, int lod, float baseDensity, float erosion)
