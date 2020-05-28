@@ -13,7 +13,7 @@ uniform float _SigmaScattering = 0.1;
 /// If ADAPTIVE_STEPS is used, it uses a multiple of the base step size depending on how many of the previous base densities are below zero, indicating the raymarch is in a region of empty density.
 /// When a positive base density is hit, it cancels the step and then begins using a single base step.
 /// Otherwise, it uses just a single step of the base step size.
-float2 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float stepSizeBase, float3 raymarchStart, float3 raymarchDirection, int lod, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
+float2 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float stepSizeBase, float3 raymarchStart, float3 raymarchDirection, float lod, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
 {
 	float nextOffset = offsets.z + stepSizeBase;
 	float finalOffset = nextOffset;
