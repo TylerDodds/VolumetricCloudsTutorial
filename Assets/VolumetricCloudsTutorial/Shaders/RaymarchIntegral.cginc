@@ -84,7 +84,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 				const float transmittance = exp(-extinction * stepSizeBase);
 
 				float isotropicScatteringRate;
-				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, baseDensityCurrent, stepSizeBase, isotropicScatteringRate) * lerp(1.0, _WetIntensityFraction, wetness);
+				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, GetFinalDensity(baseDensityCurrent), stepSizeBase, isotropicScatteringRate) * lerp(1.0, _WetIntensityFraction, wetness);
 				float2 scatteredAmbientIntensities = scattering * GetAmbientIntensityTopBottom(heightFraction, _SigmaExtinction) * isotropicScatteringRate;
 
 				float integratedIntensity = (scatteredIntensity - scatteredIntensity * transmittance) / clampedExtinction;
