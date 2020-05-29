@@ -138,6 +138,11 @@ float GetBaseDensity(float3 pos, float lod, out float wetness, out float3 animat
 	float coverage;
 	bool gotWeather = GetWeatherInformation(pos, wetness, animatedPos, heightFraction, heightDensity, erosion, coverage);
 
+	if (!gotWeather)
+	{
+		return 0;
+	}
+
 	return GetBaseDensityFromWeather(lod, wetness, animatedPos, heightFraction, heightDensity, coverage);
 }
 
