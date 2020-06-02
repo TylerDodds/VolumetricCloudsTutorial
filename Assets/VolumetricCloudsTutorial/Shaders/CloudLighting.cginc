@@ -63,7 +63,7 @@ float LightenTransmittance(float transmittance, float cosTheta)
 float GetIsotropicScatteringRate(float heightFraction, float baseDensity, float stepSize, float lightDirectionOpticalDistance)
 {
 	float verticalScatteringRate = pow(RemapClamped(heightFraction, _HeightScattering_Low_High_Min_Power.x, _HeightScattering_Low_High_Min_Power.y, _HeightScattering_Low_High_Min_Power.z, 1.0), _HeightScattering_Low_High_Min_Power.w);
-	float depthScatteringBase = pow(saturate(baseDensity), RemapClamped(heightFraction, _DepthScattering_Low_High_Min_Max.x, _DepthScattering_Low_High_Min_Max.y, _DepthScattering_Low_High_Min_Max.z, _DepthScattering_Low_High_Min_Max.w));
+	float depthScatteringBase = pow(saturate(baseDensity) + 1e-6, RemapClamped(heightFraction, _DepthScattering_Low_High_Min_Max.x, _DepthScattering_Low_High_Min_Max.y, _DepthScattering_Low_High_Min_Max.z, _DepthScattering_Low_High_Min_Max.w));
 	float depthScatteringRate = lerp(0.05 + depthScatteringBase, 1.0, saturate(lightDirectionOpticalDistance / depthScatteringDistanceScale));
 	float isotropicScatteringRate = verticalScatteringRate * depthScatteringRate;
 	return isotropicScatteringRate;

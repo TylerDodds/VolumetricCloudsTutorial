@@ -13,20 +13,20 @@ uniform float _SigmaScattering = 0.1;
 /// If ADAPTIVE_STEPS is used, it uses a multiple of the base step size depending on how many of the previous base densities are below zero, indicating the raymarch is in a region of empty density.
 /// When a positive base density is hit, it cancels the step and then begins using a single base step.
 /// Otherwise, it uses just a single step of the base step size.
-float2 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float stepSizeBase, float3 raymarchStart, float3 raymarchDirection, float lod, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
+float3 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float stepSizeBase, float3 raymarchStart, float3 raymarchDirection, float2 lods, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
 {
 	float nextOffset = offsets.z + stepSizeBase;
 	float finalOffset = nextOffset;
 	float3 finalPosition;
-	float baseDensity;
-	#define UPDATE_POS_DEN finalPosition = raymarchStart + raymarchDirection * finalOffset; baseDensity = GetBaseDensity(finalPosition, lod, wetness, animatedPos, heightFraction, erosion);
+	float2 baseDensity;
+	#define UPDATE_POS_DEN finalPosition = raymarchStart + raymarchDirection * finalOffset; baseDensity = GetBaseDensityAtLODs(finalPosition, lods, wetness, animatedPos, heightFraction, erosion);
 	#if defined(ADAPTIVE_STEPS)
 	if (all(step(baseDensities, 0)))
 	{
 		int stepFactor = baseDensities.z < baseDensities.y ? (baseDensities.y < baseDensities.x ? ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC : ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM) : ADAPTIVE_FRACTION_DENSITY_INCREASING;
 		finalOffset = offsets.z + stepFactor * stepSizeBase;
 		UPDATE_POS_DEN
-		if (baseDensity > 0)
+		if (baseDensity.x > 0)
 		{
 			finalOffset = nextOffset;
 			UPDATE_POS_DEN
@@ -39,7 +39,7 @@ float2 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float s
 	#else
 	UPDATE_POS_DEN
 	#endif
-	return float2(finalOffset, baseDensity);
+	return float3(finalOffset, baseDensity.x, baseDensity.y);
 }
 
 
@@ -56,24 +56,24 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 	float4 transmittanceIntensitiesDepthAccumulator = float4(1, 0, 0, 0);
 	depthApprox = 0;
 	float depthWeightSum = 0;
-	float mipLod = 0;
+	float2 mipLod = float2(0, 2);
 
 	float baseDensityStep1 = 0;
 	float baseDensityStep2 = 0;
 	float offsetStep1 = currentOffset - stepSizeBase;
 	float offsetStep2 = currentOffset - 2 * stepSizeBase;
-	float baseDensityCurrent = 0;
+	float2 baseDensityCurrent = 0;
 
 	float offsetMax = numSteps * stepSizeBase;
 	float wetness;
 	float3 animatedPos;
 	float heightFraction, erosion;
 
-	baseDensityCurrent = GetBaseDensity(worldMarchPos, mipLod, wetness, animatedPos, heightFraction, erosion);
+	baseDensityCurrent = GetBaseDensityAtLODs(worldMarchPos, mipLod, wetness, animatedPos, heightFraction, erosion);
 	UNITY_LOOP
 		for (int step = 0; step < numSteps && currentOffset < offsetMax && transmittanceIntensitiesDepthAccumulator.r > _opaqueCutoff; step++)
 		{
-			const float detailDensity = GetDetailDensity(worldMarchPos, animatedPos, heightFraction, mipLod, baseDensityCurrent, erosion);
+			const float detailDensity = GetDetailDensity(worldMarchPos, animatedPos, heightFraction, mipLod, baseDensityCurrent.x, erosion);
 			const float density = GetFinalDensity(detailDensity);
 
 			if (density > 0)
@@ -84,7 +84,7 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 				const float transmittance = exp(-extinction * stepSizeBase);
 
 				float isotropicScatteringRate;
-				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, GetFinalDensity(baseDensityCurrent), stepSizeBase, isotropicScatteringRate) * lerp(1.0, _WetIntensityFraction, wetness);
+				float scatteredIntensity = scattering * GetSunLightScatteringIntensity(worldMarchPos, worldDirection, heightFraction, GetFinalDensity(baseDensityCurrent.y), stepSizeBase, isotropicScatteringRate) * lerp(1.0, _WetIntensityFraction, wetness);
 				float2 scatteredAmbientIntensities = scattering * GetAmbientIntensityTopBottom(heightFraction, _SigmaExtinction) * isotropicScatteringRate;
 
 				float integratedIntensity = (scatteredIntensity - scatteredIntensity * transmittance) / clampedExtinction;
@@ -101,12 +101,12 @@ float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStar
 				depthWeightSum += depthWeight;
 			}
 
-			float3 densities = float3(baseDensityStep2, baseDensityStep1, baseDensityCurrent);
+			float3 densities = float3(baseDensityStep2, baseDensityStep1, baseDensityCurrent.x);
 			float3 offsets = float3(offsetStep2, offsetStep1, currentOffset);
-			float2 nextOffsetAndDensity = GetNextOffsetAndBaseDensity(densities, offsets, stepSizeBase, raymarchStart, worldDirection, mipLod, wetness, animatedPos, heightFraction, erosion);
+			float3 nextOffsetAndDensity = GetNextOffsetAndBaseDensity(densities, offsets, stepSizeBase, raymarchStart, worldDirection, mipLod, wetness, animatedPos, heightFraction, erosion);
 			baseDensityStep2 = baseDensityStep1;
-			baseDensityStep1 = baseDensityCurrent;
-			baseDensityCurrent = nextOffsetAndDensity.y;
+			baseDensityStep1 = baseDensityCurrent.x;
+			baseDensityCurrent = nextOffsetAndDensity.yz;
 			offsetStep2 = offsetStep1;
 			offsetStep1 = currentOffset;
 			currentOffset = nextOffsetAndDensity.x;
