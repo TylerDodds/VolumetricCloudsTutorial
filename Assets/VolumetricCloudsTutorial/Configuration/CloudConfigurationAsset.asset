@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _weatherTexture: {fileID: 2800000, guid: ab092748e1ab93241ad07b98fdd04774, type: 3}
   _cloudScaleKm: 32.2
-  _weatherScaleKm: 75
+  _weatherScaleKm: 37.63
   _windDirection: {x: 1, y: 0.4, z: -1}
   _windStrength: 100
   _windHeightSkewFactor: 0.2
@@ -27,9 +27,9 @@ MonoBehaviour:
   _densityErosionTexture: {fileID: 2800000, guid: 7fb59ef3a543507439b44d593284359f,
     type: 3}
   _detailTiling: 22.32
-  _detailStrength: 0.453
-  _curlTiling: 0.1
-  _curlStrength: 0.0259
+  _detailStrength: 0.322
+  _curlTiling: 0.53
+  _curlStrength: 0.0277
   _sigmaExtinction: 0.01
   _sigmaScattering: 0.01
   _cloudDensityOffset: 0.101
@@ -55,4 +55,4 @@ MonoBehaviour:
   _depthScatteringMaxPower: 1.15
   _ambientBottom: {r: 0.4716981, g: 0.382574, b: 0.35599858, a: 1}
   _ambientTop: {r: 0.73899996, g: 0.84775, b: 1, a: 1}
-  _wetIntensityFraction: 1
+  _wetIntensityFraction: 0.317
