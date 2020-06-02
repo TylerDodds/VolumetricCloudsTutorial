@@ -146,6 +146,22 @@ float GetBaseDensity(float3 pos, float lod, out float wetness, out float3 animat
 	return GetBaseDensityFromWeather(lod, wetness, animatedPos, heightFraction, heightDensity, coverage);
 }
 
+float2 GetBaseDensityAtLODs(float3 pos, float2 lod, out float wetness, out float3 animatedPos, out float heightFraction, out float erosion)
+{
+	float heightDensity;
+	float coverage;
+	bool gotWeather = GetWeatherInformation(pos, wetness, animatedPos, heightFraction, heightDensity, erosion, coverage);
+
+	if (!gotWeather)
+	{
+		return float2(0, 0);
+	}
+
+	float density1 = GetBaseDensityFromWeather(lod.x, wetness, animatedPos, heightFraction, heightDensity, coverage);
+	float density2 = GetBaseDensityFromWeather(lod.y, wetness, animatedPos, heightFraction, heightDensity, coverage);
+	return float2(density1, density2);
+}
+
 float GetDetailDensity(float3 posBase, float3 animatedPos, float heightFraction, int lod, float baseDensity, float erosion)
 {
 	float3 curlSamplePos = animatedPos + _WindStrengthAndSkew.xyz * _Time.y * 0.5;
