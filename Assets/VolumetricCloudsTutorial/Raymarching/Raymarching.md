@@ -478,8 +478,12 @@ Note that we may parametrize these step sizes based on the
 base step size; if it is smaller, we can take vary large multiples of that step
 size without worrying that we will completely skip over any regions of positive
 density.
-With some fine tuning, we can save around a factor of two in execution time,
-with no perceptible visual changes.
+With some fine tuning, we can lower the execution time
+at the higher quality levels, with no perceptible visual changes. For the lower
+quality levels, where step sizes are large, savings may be minimal or negative.
+Finally, the higher the amount of cloud coverage, the less helpful adaptive
+steps will be, since we rely on multiple steps' worth of savings in-between
+regions of non-zero cloud density.
 
 ### RaymarchTransmittanceAndIntegratedIntensityAndDepth
 

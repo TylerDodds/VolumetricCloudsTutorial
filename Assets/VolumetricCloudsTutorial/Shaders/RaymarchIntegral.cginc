@@ -23,7 +23,7 @@ float3 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float s
 	#if defined(ADAPTIVE_STEPS)
 	if (all(step(baseDensities, 0)))
 	{
-		int stepFactor = baseDensities.z < baseDensities.y ? (baseDensities.y < baseDensities.x ? ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC : ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM) : ADAPTIVE_FRACTION_DENSITY_INCREASING;
+		int stepFactor = baseDensities.z <= baseDensities.y ? (baseDensities.y < baseDensities.x ? ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC : ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM) : ADAPTIVE_FRACTION_DENSITY_INCREASING;
 		finalOffset = offsets.z + stepFactor * stepSizeBase;
 		UPDATE_POS_DEN
 		if (baseDensity.x > 0)
@@ -47,7 +47,7 @@ float3 GetNextOffsetAndBaseDensity(float3 baseDensities, float3 offsets, float s
 /// raymarch starting positiong and direction, raymarch distance, view vector start position, and offset along the ray.
 float4 RaymarchTransmittanceAndIntegratedIntensitiesAndDepth(float3 raymarchStart, float3 worldDirection, float distance, float3 startPos, float offset, out float depthApprox)
 {
-	int numSteps = GetNumberOfSteps(distance);
+	int numSteps = GetNumberOfSteps(distance, worldDirection);
 	float stepSizeBase = distance / numSteps;
 
 	float currentOffset = offset * stepSizeBase;

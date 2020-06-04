@@ -60,7 +60,7 @@
 			CGPROGRAM
 			#pragma vertex VertUvScreenViewPos
 			#pragma fragment frag
-			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW
+			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW QUALITY_EXTREME
 			#pragma shader_feature UNPACK_CURL
 			#pragma multi_compile _ ADAPTIVE_STEPS
 			ENDCG
