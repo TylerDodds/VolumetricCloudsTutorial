@@ -3,37 +3,55 @@
 
 #include "CloudConstants.cginc"
 
-#if defined(QUALITY_HIGH)//TODO finalize these numbers
+#if defined(QUALITY_EXTREME)
 #define ADAPTIVE_FRACTION_DENSITY_INCREASING 4
 #define ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM 6
 #define ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC 8
-#define TARGET_STEP_SIZE 50
-#define MIN_NUM_STEPS 256
-#define MAX_NUM_STEPS 256
+#define TARGET_STEP_SIZE 120
+#define MIN_NUM_STEPS 96
+#define MAX_NUM_STEPS 128
+#elif defined(QUALITY_HIGH)
+#define ADAPTIVE_FRACTION_DENSITY_INCREASING 2
+#define ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM 2.5
+#define ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC 3
+#define TARGET_STEP_SIZE 120
+#define MIN_NUM_STEPS 48
+#define MAX_NUM_STEPS 64
 #elif defined(QUALITY_LOW)
 #define ADAPTIVE_FRACTION_DENSITY_INCREASING 1
 #define ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM 1.5
 #define ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC 2
-#define TARGET_STEP_SIZE 50
-#define MIN_NUM_STEPS 16
+#define TARGET_STEP_SIZE 450
+#define MIN_NUM_STEPS 12
 #define MAX_NUM_STEPS 16
 #else
-#define ADAPTIVE_FRACTION_DENSITY_INCREASING 2
-#define ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM 2.5
-#define ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC 3
-#define TARGET_STEP_SIZE 50
-#define MIN_NUM_STEPS 64
-#define MAX_NUM_STEPS 64
+#define ADAPTIVE_FRACTION_DENSITY_INCREASING 1.5
+#define ADAPTIVE_FRACTION_DENSITY_DECREASING_LOCAL_MAXIMUM 2
+#define ADAPTIVE_FRACTION_DENSITY_DECREASING_MONOTONIC 2.5
+#define TARGET_STEP_SIZE 220
+#define MIN_NUM_STEPS 24
+#define MAX_NUM_STEPS 32
 #endif
-
 
 
 /// Gets the number of steps based on TARGET_STEP_SIZE,
 /// clamped between MIN_NUM_STEPS and MAX_NUM_STEPS.
-int GetNumberOfSteps(float distance)
+int GetNumberOfSteps_Distance(float distance)
 {
 	int numSteps = distance / TARGET_STEP_SIZE;
 	return min(max(numSteps, MIN_NUM_STEPS), MAX_NUM_STEPS);
+}
+
+/// Gets the number of steps between MIN_NUM_STEPS (vertical directions) and MAX_NUM_STEPS (horizontal directions).
+int GetNumberOfSteps_Direction(float3 rayWorldDirection)
+{
+	return lerp(MAX_NUM_STEPS, MIN_NUM_STEPS, abs(rayWorldDirection.y));
+}
+
+/// Gets the number of steps based on distance and/or ray direction.
+int GetNumberOfSteps(float distance, float3 rayWorldDirection)
+{
+	return GetNumberOfSteps_Direction(rayWorldDirection);
 }
 
 /// From a camera view ray, get the raymarch interval (start position, distance to raymarch, and distance to start position)

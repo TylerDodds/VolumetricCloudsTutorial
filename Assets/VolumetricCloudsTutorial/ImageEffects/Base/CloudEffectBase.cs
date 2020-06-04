@@ -39,6 +39,7 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
             SetKeyword("ADAPTIVE_STEPS", _adaptiveStepSize);
             SetKeyword("QUALITY_LOW", _raymarchStepQuality == RaymarchStepQuality.Low);
             SetKeyword("QUALITY_HIGH", _raymarchStepQuality == RaymarchStepQuality.High);
+            SetKeyword("QUALITY_EXTREME", _raymarchStepQuality == RaymarchStepQuality.Extreme);
             if (_cloudConfiguration != null)
             {
                 _cloudConfiguration.SetMaterialProperties(material);
@@ -49,7 +50,8 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         {
             Low,
             Normal,
-            High
+            High,
+            Extreme,
         }
     }
 }

@@ -27,10 +27,9 @@
 			CGPROGRAM
 			#pragma vertex VertRaymarch
 			#pragma fragment FragRaymarch
-			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW
+			#pragma multi_compile _ QUALITY_HIGH QUALITY_LOW QUALITY_EXTREME
 			#pragma shader_feature UNPACK_CURL
 			#pragma multi_compile _ ADAPTIVE_STEPS
-			#pragma multi_compile _ DOWNSAMPLE_1 DOWNSAMPLE_2
 
 			float _RaymarchOffset; //Fractional offset along first step; changes every frame to avoid biased sampling
 			float2 _RaymarchedBuffer_TexelSize;	//Texel size of final buffer used to detemine neighbour offset from Bayer Matrix
