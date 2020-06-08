@@ -19,7 +19,7 @@ namespace VolumetricCloudsTutorial.ImageEffects.Base
         /// <summary>
         /// If adaptive step size raymarching should be used.
         /// </summary>
-        [Tooltip("If adaptive step size raymarching should be used")]
+        [Tooltip("If adaptive step size raymarching should be used. Not recommended for Low or Normal quality settings.")]
         [SerializeField] private bool _adaptiveStepSize = false;
 
         /// <summary>
