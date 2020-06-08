@@ -463,7 +463,7 @@ However, since the coverage and density consist of fairly complicated noise
 functions, this approach is difficult to implement in a correct and useful
 fashion, so we will not pursue it.
 Similarly, we could base the step size on the local density. Starting from
-`transmittance = exp(-density * extinction * stepSize)`, then an apropriate step
+`transmittance = exp(-density * extinction * stepSize)`, then an appropriate step
 size could be based on the maximum change in transmittance we desire over each step,
 `target_step_size = -log(target_transmittance) / (density * extinction)`,
 although this approach suffers from similar issues.
@@ -472,7 +472,7 @@ on cloud coverage instead, which
 tells us the maximum possible density values, and will change
 more slowly and continuously over distance. This approach would be a sort of
 middle ground between our local approach and the hierarchical cloud coverage
-lookup apprroach discussed above.
+lookup approach discussed above.
 
 Note that we may parametrize these step sizes based on the
 base step size; if it is smaller, we can take vary large multiples of that step
