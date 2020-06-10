@@ -30,6 +30,7 @@ static const float maxDetailRemapping = 0.8;
 /// Distance scale used to rescale optical distance in depth scattering calculation
 static const float depthScatteringDistanceScale = 100.0;
 
+/// Gets the amount of fading as view direction crosses below horizon.
 float GetHorizonFadeFactor(float3 worldSpaceRaymarchDirection)
 {
 	return (1 - smoothstep(0, -fadeHorizonAngle, worldSpaceRaymarchDirection.y));
